@@ -15,13 +15,25 @@
         <id>user.password</id>
         <label>Password</label>
         <type>text</type>
-        <help>Set the password for the user. Minimum is 8 characters.</help>
+        <help>Set the authentication password for the user. Minimum is 8 characters.</help>
+    </field>
+    <field>
+        <id>user.authsnmp</id>
+        <label>Authentication Protocol</label>
+        <type>dropdown</type>
+        <help>Choose the correct Authentication protocol. Recomended to avoid MD5.</help>
     </field>
     <field>
         <id>user.enckey</id>
-        <label>Encryption Key</label>
+        <label>Privacy Key</label>
         <type>text</type>
-        <help>Set the encryption key to secure the connection between client and this host. Minimum is 8 characters.</help>
+        <help>Set the privacy key to secure the connection between client and this host. Minimum is 8 characters.</help>
+    </field>
+    <field>
+        <id>user.privacysnmp</id>
+        <label>Privacy Protocol</label>
+        <type>dropdown</type>
+        <help>Choose the correct Privacy protocol. Recomended to avoid DES.</help>
     </field>
     <field>
         <id>user.readwrite</id>

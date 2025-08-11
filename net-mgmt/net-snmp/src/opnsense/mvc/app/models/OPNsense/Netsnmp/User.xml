@@ -1,7 +1,7 @@
 <model>
     <mount>//OPNsense/netsnmp/user</mount>
     <description>Netsnmp user configuration</description>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <items>
         <users>
             <user type="ArrayField">
@@ -27,6 +27,32 @@
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
                 </enckey>
+                <authsnmp type="OptionField">
+					<Default>none</Default>
+					<Required>Y</Required>
+                    <OptionValues>
+                        <none>None</none>
+                        <md5>MD5</md5>
+                        <sha>SHA</sha>
+                        <sha-224>SHA-224</sha-224>
+                        <sha-256>SHA-256</sha-256>
+                        <sha-384>SHA-384</sha-384>
+                        <sha-512>SHA-512</sha-512>
+                    </OptionValues>
+                <ValidationMessage>Please select a valid authentication protocol.</ValidationMessage>
+                </authsnmp>
+                <privacysnmp type="OptionField">
+					<Default>none</Default>
+					<Required>Y</Required>
+                    <OptionValues>
+                        <none>None</none>
+                        <des>DES</des>
+                        <aes>AES</aes>
+                        <aes-192>AES-192</aes-192>
+                        <aes-256>AES-256</aes-256>
+                        </OptionValues>
+                <ValidationMessage>Please select a valid privacy protocol.</ValidationMessage>
+                </privacysnmp>
                 <readwrite type="BooleanField">
                     <Default>0</Default>
                     <Required>Y</Required>
