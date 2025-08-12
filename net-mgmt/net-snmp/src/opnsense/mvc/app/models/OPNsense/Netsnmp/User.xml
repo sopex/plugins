@@ -17,13 +17,28 @@
                 </username>
                 <password type="TextField">
                     <Default></Default>
-                    <Required>Y</Required>
+                    <Required>N</Required>
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
+					<Constraints>
+						<check1>
+						<Code>authsnmp_is_none</Code>
+						<ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage>
+						</check1>
+					</Constraints>
                 </password>
+				
+
+				
+				
+				
+				
+				
+				
+				
                 <enckey type="TextField">
                     <Default></Default>
-                    <Required>Y</Required>
+                    <Required>N</Required>
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
                 </enckey>
