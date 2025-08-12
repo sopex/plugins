@@ -67,7 +67,7 @@
 					</OptionValues>
 					<ValidationMessage>Please select a valid privacy protocol.</ValidationMessage>
 					<Constraints>
-						<check001><type>DependConstraint</type><addFields><field1>authsnmp</field1></addFields></check001>
+						<check001><type>DependConstraint</type><ValidationMessage>You cannnot setup the privacy protocol without setting up the authentication protocol.</ValidationMessage><field>authsnmp</field></check001>
 					</Constraints>
                 </privacysnmp>
                 <readwrite type="BooleanField">
