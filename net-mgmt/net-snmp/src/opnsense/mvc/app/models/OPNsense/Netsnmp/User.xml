@@ -64,15 +64,6 @@
                         <aes-192>AES-192</aes-192>
                         <aes-256>AES-256</aes-256>
 					</OptionValues>
-                    <Constraints>
-                        <check001>
-                            <ValidationMessage>You cannot set the privacy protocol without setting the authentication protocol.</ValidationMessage>
-                            <type>DependConstraint</type>
-                            <addFields>
-                                <field1>password</field1>
-                            </addFields>
-                        </check001>
-                    </Constraints>
                 </privacysnmp>
                 <readwrite type="BooleanField">
                     <Default>0</Default>
