@@ -38,7 +38,13 @@ class ServiceController extends ApiControllerBase
     {
         $backend = new Backend();
 
-        $devices = preg_split("/[\s]+/", trim($backend->configdRun("smart list")));
+        $output = trim($backend->configdpRun("smart", array("list")));
+
+        if ($output === '') {
+            return [];
+        }
+
+        $devices = preg_split("/[\s]+/", $output);
 
         return $devices;
     }
@@ -48,8 +54,16 @@ class ServiceController extends ApiControllerBase
         if ($this->request->isPost()) {
             $backend = new Backend();
 
-            $devices = empty($details) ? $this->getDevices() :
-                json_decode(trim($backend->configdRun('smart detailed list')), true);
+            if (empty($details)) {
+                $devices = $this->getDevices();
+            } else {
+                $output = trim($backend->configdpRun("smart", array("detailed", "list")));
+                $devices = json_decode($output, true);
+
+                if (!is_array($devices)) {
+                    return ['devices' => []];
+                }
+            }
 
             return ['devices' => $devices];
         }
