@@ -1,6 +1,6 @@
 {#
 
-OPNsense® is Copyright © 2014 – 2018 by Deciso B.V.
+OPNsense® is Copyright © 2014 - 2018 by Deciso B.V.
 This file is Copyright © 2018 by Michael Muenz <m.muenz@gmail.com>
 All rights reserved.
 
@@ -49,8 +49,10 @@ POSSIBILITY OF SUCH DAMAGE.
                 <tr>
                     <th data-column-id="enabled" data-type="string" data-formatter="rowtoggle">{{ lang._('Enabled') }}</th>
                     <th data-column-id="username" data-type="string" data-visible="true">{{ lang._('Username') }}</th>
-                    <th data-column-id="password" data-type="string" data-visible="true">{{ lang._('Password') }}</th>
-                    <th data-column-id="enckey" data-type="string" data-visible="true">{{ lang._('Encryption Key') }}</th>
+                    <th data-column-id="password" data-type="string" data-visible="true">{{ lang._('Auth Key') }}</th>
+			        <th data-column-id="authsnmp" data-type="string" data-visible="true">{{ lang._('Auth Protocol') }}</th>
+                    <th data-column-id="enckey" data-type="string" data-visible="true">{{ lang._('Privacy Key') }}</th>
+                    <th data-column-id="privacysnmp" data-type="string" data-visible="true">{{ lang._('Privacy Protocol') }}</th>
                     <th data-column-id="uuid" data-type="string" data-identifier="true" data-visible="false">{{ lang._('ID') }}</th>
                     <th data-column-id="commands" data-formatter="commands" data-sortable="false">{{ lang._('Commands') }}</th>
                 </tr>
@@ -59,7 +61,7 @@ POSSIBILITY OF SUCH DAMAGE.
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5"></td>
+                    <td colspan="7"></td>
                     <td>
                         <button data-action="add" type="button" class="btn btn-xs btn-default"><span class="fa fa-plus"></span></button>
                     </td>

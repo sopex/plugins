@@ -11,6 +11,11 @@ WWW: http://www.net-snmp.org
 Plugin Changelog
 ----------------
 
+1.7
+
+* Added support for authentication protocol's options MD5, SHA, SHA-224, SHA-256, SHA-384, SHA-512 (contributed by sopex)
+* Added support for privacy protocol's options DES, AES-128, AES-192, AES-256 (contributed by sopex)
+
 1.6
 
 * Add support for Observium (contributed by Patrick M. Hausen)

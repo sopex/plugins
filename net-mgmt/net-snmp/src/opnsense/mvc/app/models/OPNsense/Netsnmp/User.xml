@@ -1,7 +1,7 @@
 <model>
     <mount>//OPNsense/netsnmp/user</mount>
     <description>Netsnmp user configuration</description>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <items>
         <users>
             <user type="ArrayField">
@@ -17,16 +17,54 @@
                 </username>
                 <password type="TextField">
                     <Default></Default>
-                    <Required>Y</Required>
+                    <Required>N</Required>
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
+					<Constraints>
+                        <check001><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>MD5</check></check001>
+						<check002><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>SHA</check></check002>
+						<check003><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>SHA224</check></check003>
+						<check004><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>SHA256</check></check004>
+						<check005><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>SHA384</check></check005>
+						<check006><type>SetIfConstraint</type><ValidationMessage>Authentication password is required when an authentication protocol is selected.</ValidationMessage><field>authsnmp</field><check>SHA512</check></check006>
+					</Constraints>
                 </password>
                 <enckey type="TextField">
                     <Default></Default>
-                    <Required>Y</Required>
+                    <Required>N</Required>
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
+					<Constraints>
+                        <check001><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>DES</check></check001>
+						<check002><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>AES</check></check002>
+						<check003><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>AES192</check></check003>
+						<check004><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>AES256</check></check004>
+					</Constraints>
                 </enckey>
+                <authsnmp type="OptionField">
+					<Default>none</Default>
+					<Required>Y</Required>
+                    <OptionValues>
+                        <none>Please choose:</none>
+                        <MD5>MD5</MD5>
+                        <SHA>SHA</SHA>
+                        <SHA224>SHA-224</SHA224>
+                        <SHA256>SHA-256</SHA256>
+                        <SHA384>SHA-384</SHA384>
+                        <SHA512>SHA-512</SHA512>
+                    </OptionValues>
+                </authsnmp>
+                <privacysnmp type="OptionField">
+					<Default>none</Default>
+					<Required>Y</Required>
+                    <OptionValues>
+                        <none>Please choose:</none>
+                        <DES>DES</DES>
+                        <AES>AES-128</AES>
+                        <AES192>AES-192</AES192>
+                        <AES256>AES-256</AES256>
+					</OptionValues>
+                </privacysnmp>
                 <readwrite type="BooleanField">
                     <Default>0</Default>
                     <Required>Y</Required>

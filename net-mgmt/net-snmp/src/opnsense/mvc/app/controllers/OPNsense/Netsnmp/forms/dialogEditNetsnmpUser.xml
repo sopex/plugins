@@ -12,16 +12,28 @@
         <help>Set the unique username for the user.</help>
     </field>
     <field>
+        <id>user.authsnmp</id>
+        <label>Authentication Protocol</label>
+        <type>dropdown</type>
+        <help>Choose the correct Authentication protocol. Recommended to avoid MD5.</help>
+    </field>
+    <field>
         <id>user.password</id>
-        <label>Password</label>
+        <label>Authentication key</label>
         <type>text</type>
-        <help>Set the password for the user. Minimum is 8 characters.</help>
+        <help>Set the authentication key for the user. Minimum is 8 characters.</help>
+    </field>
+    <field>
+        <id>user.privacysnmp</id>
+        <label>Privacy Protocol</label>
+        <type>dropdown</type>
+        <help>Choose the correct Privacy protocol. You need to enable the authentication key first. Recommended to avoid DES.</help>
     </field>
     <field>
         <id>user.enckey</id>
-        <label>Encryption Key</label>
+        <label>Privacy Key</label>
         <type>text</type>
-        <help>Set the encryption key to secure the connection between client and this host. Minimum is 8 characters.</help>
+        <help>Set the privacy key to secure the connection between client and this host. Minimum is 8 characters.</help>
     </field>
     <field>
         <id>user.readwrite</id>

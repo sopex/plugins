@@ -37,7 +37,7 @@ class UserController extends ApiMutableModelControllerBase
 
     public function searchUserAction()
     {
-        return $this->searchBase('users.user', ['enabled', 'username', 'password', 'enckey']);
+        return $this->searchBase('users.user', ['enabled', 'username', 'password', 'authsnmp', 'enckey', 'privacysnmp']);
     }
 
     public function getUserAction($uuid = null)
