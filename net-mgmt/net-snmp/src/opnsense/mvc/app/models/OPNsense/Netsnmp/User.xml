@@ -1,7 +1,7 @@
 <model>
     <mount>//OPNsense/netsnmp/user</mount>
     <description>Netsnmp user configuration</description>
-    <version>1.1</version>
+    <version>1.1.0</version>
     <items>
         <users>
             <user type="ArrayField">
@@ -48,10 +48,10 @@
                         <none>Please choose:</none>
                         <md5>MD5</md5>
                         <sha>SHA</sha>
-                        <sha-224>SHA-224</sha-224>
-                        <sha-256>SHA-256</sha-256>
-                        <sha-384>SHA-384</sha-384>
-                        <sha-512>SHA-512</sha-512>
+                        <sha224>SHA224</sha224>
+                        <sha256>SHA256</sha256>
+                        <sha384>SHA384</sha384>
+                        <sha512>SHA512</sha512>
                     </OptionValues>
                     <Constraints>
                         <check001><type>SetIfConstraint</type><ValidationMessage>Authentication protocol must be selected when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>des</check></check001>
@@ -67,8 +67,8 @@
                         <none>Please choose:</none>
                         <des>DES</des>
                         <aes>AES-128</aes>
-                        <aes-192>AES-192</aes-192>
-                        <aes-256>AES-256</aes-256>
+                        <aes192>AES-192</aes192>
+                        <aes256>AES-256</aes256>
 					</OptionValues>
                 </privacysnmp>
                 <readwrite type="BooleanField">
