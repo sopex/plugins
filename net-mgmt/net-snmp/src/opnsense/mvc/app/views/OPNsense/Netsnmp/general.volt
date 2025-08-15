@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 <tr>
                     <th data-column-id="enabled" data-type="string" data-formatter="rowtoggle">{{ lang._('Enabled') }}</th>
                     <th data-column-id="username" data-type="string" data-visible="true">{{ lang._('Username') }}</th>
-                    <th data-column-id="password" data-type="string" data-visible="true">{{ lang._('Password') }}</th>
+                    <th data-column-id="password" data-type="string" data-visible="true">{{ lang._('Auth Key') }}</th>
 					<th data-column-id="authsnmp" data-type="string" data-visible="true">{{ lang._('Auth Protocol') }}</th>
                     <th data-column-id="enckey" data-type="string" data-visible="true">{{ lang._('Privacy Key') }}</th>
                     <th data-column-id="privacysnmp" data-type="string" data-visible="true">{{ lang._('Privacy Protocol') }}</th>

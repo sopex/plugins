@@ -35,17 +35,17 @@
                     <Mask>/^([0-9a-zA-Z._\-\!\$\%\/\(\)\+\#\=]){8,64}$/u</Mask>
                     <ValidationMessage>Should be a string between 8 and 64 characters. Allowed characters are 0-9a-zA-Z._-!$%/()+#=</ValidationMessage>
 					<Constraints>
-                        <check001><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when an privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>des</check></check001>
-						<check002><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when an privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes</check></check002>
-						<check003><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when an privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-192</check></check003>
-						<check004><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when an privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-256</check></check004>
+                        <check001><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>des</check></check001>
+						<check002><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes</check></check002>
+						<check003><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-192</check></check003>
+						<check004><type>SetIfConstraint</type><ValidationMessage>Privacy password is required when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-256</check></check004>
 					</Constraints>
                 </enckey>
                 <authsnmp type="OptionField">
 					<Default>none</Default>
 					<Required>Y</Required>
                     <OptionValues>
-                        <none>Disabled</none>
+                        <none>Please choose:</none>
                         <md5>MD5</md5>
                         <sha>SHA</sha>
                         <sha-224>SHA-224</sha-224>
@@ -53,14 +53,20 @@
                         <sha-384>SHA-384</sha-384>
                         <sha-512>SHA-512</sha-512>
                     </OptionValues>
+                    <Constraints>
+                        <check001><type>SetIfConstraint</type><ValidationMessage>Authentication protocol must be selected when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>des</check></check001>
+                        <check002><type>SetIfConstraint</type><ValidationMessage>Authentication protocol must be selected when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes</check></check002>
+                        <check003><type>SetIfConstraint</type><ValidationMessage>Authentication protocol must be selected when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-192</check></check003>
+                        <check004><type>SetIfConstraint</type><ValidationMessage>Authentication protocol must be selected when a privacy protocol is selected.</ValidationMessage><field>privacysnmp</field><check>aes-256</check></check004>
+                    </Constraints>
                 </authsnmp>
                 <privacysnmp type="OptionField">
 					<Default>none</Default>
 					<Required>Y</Required>
                     <OptionValues>
-                        <none>Disabled</none>
+                        <none>Please choose:</none>
                         <des>DES</des>
-                        <aes>AES</aes>
+                        <aes>AES-128</aes>
                         <aes-192>AES-192</aes-192>
                         <aes-256>AES-256</aes-256>
 					</OptionValues>
