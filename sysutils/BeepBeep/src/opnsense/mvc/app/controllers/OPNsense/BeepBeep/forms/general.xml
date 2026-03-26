@@ -1,0 +1,20 @@
+<form>
+    <field>
+        <id>beepbeep.general.Enabled</id>
+        <label>Enabled</label>
+        <type>checkbox</type>
+        <help>Enable custom startup and shutdown beep sounds</help>
+    </field>
+    <field>
+        <id>beepbeep.general.StartBeep</id>
+        <label>Startup Beep</label>
+        <type>dropdown</type>
+        <help><![CDATA[Select the beep sound to play when the system starts up]]></help>
+    </field>
+    <field>
+        <id>beepbeep.general.StopBeep</id>
+        <label>Shutdown Beep</label>
+        <type>dropdown</type>
+        <help><![CDATA[Select the beep sound to play when the system shuts down]]></help>
+    </field>
+</form>

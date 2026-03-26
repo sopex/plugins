@@ -3,8 +3,8 @@
 # Beep beep - Apply Configuration
 # Installs the selected beep scripts into rc.syshook.d for startup and shutdown
 
-CONFIG_FILE="/usr/local/etc/beep-beep/beepbeep.conf"
-BEEPS_DIR="/usr/local/etc/beep-beep/beeps"
+CONFIG_FILE="/usr/local/etc/BeepBeep/beepbeep.conf"
+BEEPS_DIR="/usr/local/etc/BeepBeep/beeps"
 START_HOOK="/usr/local/etc/rc.syshook.d/start/50-beep"
 STOP_HOOK="/usr/local/etc/rc.syshook.d/stop/50-beep"
 

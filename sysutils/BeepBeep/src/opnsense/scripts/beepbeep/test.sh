@@ -3,8 +3,8 @@
 # Beep beep - Test Beep
 # Plays the currently configured start beep for testing
 
-CONFIG_FILE="/usr/local/etc/beep-beep/beepbeep.conf"
-BEEPS_DIR="/usr/local/etc/beep-beep/beeps"
+CONFIG_FILE="/usr/local/etc/BeepBeep/beepbeep.conf"
+BEEPS_DIR="/usr/local/etc/BeepBeep/beeps"
 
 # Read a value from the INI-style config file
 read_config() {
