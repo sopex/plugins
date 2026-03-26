@@ -1,0 +1,82 @@
+<model>
+    <mount>//OPNsense/beepbeep</mount>
+    <description>
+        OPNsense Beep Beep - Custom startup and shutdown beep sounds
+    </description>
+    <items>
+        <general>
+            <Enabled type="BooleanField">
+                <Default>1</Default>
+                <Required>Y</Required>
+            </Enabled>
+            <StartBeep type="OptionField">
+                <Default>default</Default>
+                <Required>Y</Required>
+                <OptionValues>
+                    <default-start>Default</default-start>
+                    <barbie>Barbie Girl</barbie>
+                    <digdug>Dig Dug</digdug>
+                    <dkend>Donkey Kong End</dkend>
+                    <galaxian>Galaxian</galaxian>
+                    <junglehunt>Jungle Hunt</junglehunt>
+                    <marblemadness>Marble Madness</marblemadness>
+                    <mspacman>Ms. Pac-Man</mspacman>
+                    <pacman>Pac-Man</pacman>
+                    <pengo>Pengo</pengo>
+                    <poleposition>Pole Position</poleposition>
+                    <scom>Sweet Child O' Mine</scom>
+                    <smans>Spider-Man</smans>
+                    <smoverworld>Super Mario Overworld</smoverworld>
+                    <smvictory>Super Mario Victory</smvictory>
+                    <sonicend>Sonic Level End</sonicend>
+                    <startrek>Star Trek</startrek>
+                    <starwars>Star Wars</starwars>
+                    <summergames>Summer Games</summergames>
+                    <supermario>Super Mario</supermario>
+                    <thunderstruck>Thunderstruck</thunderstruck>
+                    <tronlose>Tron Lose</tronlose>
+                    <trontower>Tron Tower</trontower>
+                </OptionValues>
+            </StartBeep>
+            <StopBeep type="OptionField">
+                <Default>default</Default>
+                <Required>Y</Required>
+                <OptionValues>
+                    <default-stop>Default</default-stop>
+                    <barbie>Barbie Girl</barbie>
+                    <digdug>Dig Dug</digdug>
+                    <dkend>Donkey Kong End</dkend>
+                    <galaxian>Galaxian</galaxian>
+                    <junglehunt>Jungle Hunt</junglehunt>
+                    <marblemadness>Marble Madness</marblemadness>
+                    <mspacman>Ms. Pac-Man</mspacman>
+                    <pacman>Pac-Man</pacman>
+                    <pengo>Pengo</pengo>
+                    <poleposition>Pole Position</poleposition>
+                    <scom>Sweet Child O' Mine</scom>
+                    <smans>Spider-Man</smans>
+                    <smoverworld>Super Mario Overworld</smoverworld>
+                    <smvictory>Super Mario Victory</smvictory>
+                    <sonicend>Sonic Level End</sonicend>
+                    <startrek>Star Trek</startrek>
+                    <starwars>Star Wars</starwars>
+                    <summergames>Summer Games</summergames>
+                    <supermario>Super Mario</supermario>
+                    <thunderstruck>Thunderstruck</thunderstruck>
+                    <tronlose>Tron Lose</tronlose>
+                    <trontower>Tron Tower</trontower>
+                </OptionValues>
+            </StopBeep>
+            <StartBeepCustom type="TextField">
+                <Required>N</Required>
+                <Mask>/^[a-zA-Z0-9._\-\/]*$/</Mask>
+                <ValidationMessage>Please specify a valid file path (alphanumeric, dots, dashes, underscores, slashes only)</ValidationMessage>
+            </StartBeepCustom>
+            <StopBeepCustom type="TextField">
+                <Required>N</Required>
+                <Mask>/^[a-zA-Z0-9._\-\/]*$/</Mask>
+                <ValidationMessage>Please specify a valid file path (alphanumeric, dots, dashes, underscores, slashes only)</ValidationMessage>
+            </StopBeepCustom>
+        </general>
+    </items>
+</model>

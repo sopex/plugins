@@ -1,0 +1,5 @@
+<menu>
+    <System order="90">
+        <Beepbeep VisibleName="Beep Beep" cssClass="fa fa-volume-up fa-fw" url="/ui/beepbeep"/>
+    </System>
+</menu>

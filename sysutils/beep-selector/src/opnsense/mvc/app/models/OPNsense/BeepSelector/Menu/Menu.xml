@@ -1,5 +1,0 @@
-<menu>
-    <System order="90">
-        <BeepSelector VisibleName="Beep Selector" cssClass="fa fa-volume-up fa-fw" url="/ui/beepselector"/>
-    </System>
-</menu>

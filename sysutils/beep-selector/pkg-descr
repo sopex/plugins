@@ -1,7 +1,0 @@
-The Beep Selector plugin allows users to choose custom startup and
-shutdown beep sounds through the OPNsense web interface. Users can
-select from a list of predefined beep patterns or specify custom
-speaker notation files to play through the PC speaker on boot and
-shutdown events.
-
-WWW: https://github.com/opnsense/plugins

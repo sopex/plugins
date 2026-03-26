@@ -1,0 +1,10 @@
+<acl>
+    <page-system-beepbeep>
+        <name>System: Beep beep</name>
+        <description>Allow access to the Beep beep module</description>
+        <patterns>
+            <pattern>ui/beepbeep/*</pattern>
+            <pattern>api/beepbeep/*</pattern>
+        </patterns>
+    </page-system-beepbeep>
+</acl>

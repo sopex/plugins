@@ -1,0 +1,8 @@
+The Beep Beep plugin allows users to choose custom startup and
+shutdown beep sounds through the OPNsense web interface. Users can
+select from a list of predefined beep patternsto play through the
+PC speaker on boot and shutdown events.
+
+The beeps were provided by the OPNsense user fctr.
+
+WWW: https://github.com/opnsense/plugins
