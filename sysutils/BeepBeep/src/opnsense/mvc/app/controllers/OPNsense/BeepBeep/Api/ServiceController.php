@@ -28,7 +28,7 @@
  *
  */
 
-namespace OPNsense\Beepbeep\Api;
+namespace OPNsense\BeepBeep\Api;
 
 use OPNsense\Base\ApiControllerBase;
 use OPNsense\Core\Backend;
@@ -46,7 +46,7 @@ class ServiceController extends ApiControllerBase
     {
         $status = "failed";
         if ($this->request->isPost()) {
-            $status = strtolower(trim((new Backend())->configdRun('template reload OPNsense/Beepbeep')));
+            $status = strtolower(trim((new Backend())->configdRun('template reload OPNsense/BeepBeep')));
         }
         return ["status" => $status];
     }
