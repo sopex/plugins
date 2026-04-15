@@ -1,6 +1,11 @@
 About the OPNsense plugins
 ==========================
 
+<a href="https://scan.coverity.com/projects/sopex-plugins">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/33041/badge.svg"/>
+</a>
+
 The plugins collection offers users and developers a way to quickly
 build additions for OPNsense that can be optionally installed.  As
 soon as they are upstreamed they will become available to everyone
