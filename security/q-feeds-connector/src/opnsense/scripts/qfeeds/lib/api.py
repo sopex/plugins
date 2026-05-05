@@ -23,6 +23,7 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 """
+
 import os
 import requests
 from configparser import ConfigParser
@@ -30,8 +31,8 @@ from configparser import ConfigParser
 
 class QFeedsConfig:
     config_filename = '/usr/local/etc/qfeeds.conf'
-    api_key = None
     conf_timestamp = None
+    api_key = None
 
     def __init__(self):
         if os.path.isfile(self.config_filename):
