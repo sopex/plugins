@@ -105,7 +105,7 @@ $( document ).ready(function() {
 
 <div class="content-box" style="padding-bottom: 1.5em;">
 
-      <table id="grid-wol-settings" class="table table-responsive" data-editDialog="frm_wol_settings">
+      <table id="grid-wol-settings" class="table table-striped table-condensed table-hover" data-editDialog="frm_wol_settings">
         <thead>
             <tr>
                 <th data-column-id="interface" data-type="string" data-visible="true">{{ lang._('Interface') }}</th>
