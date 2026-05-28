@@ -112,15 +112,41 @@ class WolController extends ApiMutableModelControllerBase
         /* determine broadcast address */
         $cidr = $this->getInterfaceSubnet($wolent->interface);
         $ipaddr = $this->getInterfaceIP($wolent->interface);
-        if (empty($cidr) || empty($ipaddr)) {
+        $ipv6addr = $this->getInterfaceIPv6($wolent->interface);
+        if ((empty($cidr) || empty($ipaddr)) && empty($ipv6addr)) {
             $result['status'] = 'error';
-            $result['error_msg'] = 'Incorrect IPv4 configuration on interface';
+            $result['error_msg'] = 'Incorrect IP configuration on interface';
             return $result;
         }
-        $broadcast_ip = escapeshellarg($this->calculateSubnetBroadcast($ipaddr, $cidr));
+        if (!empty($cidr) && !empty($ipaddr)) {
+            $broadcast_ip = escapeshellarg($this->calculateSubnetBroadcast($ipaddr, $cidr));
+        } else {
+            $real_if = $this->getRealInterface($wolent->interface);
+            $broadcast_ip = escapeshellarg('ff02::1' . (!empty($real_if) ? '%' . $real_if : ''));
+        }
         $port = escapeshellarg((string)$wolent->port);
         $mac = escapeshellarg((string)$wolent->mac);
         $result['status'] = trim($backend->configdRun("wol wake {$port} {$broadcast_ip} {$mac}"));
+    }
+
+    private function getRealInterface($if)
+    {
+        $cfg = Config::getInstance()->object();
+        try {
+            return (string)$cfg->interfaces->{$if}->if;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    private function getInterfaceIPv6($if)
+    {
+        $cfg = Config::getInstance()->object();
+        try {
+            return (string)$cfg->interfaces->{$if}->ipaddrv6;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     private function getInterfaceIP($if)
