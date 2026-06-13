@@ -1,7 +1,4 @@
-This plugin offers dynamic DNS capabilities using a native backend
-or ddclient.  The native backend is the default implementation.
-ddclient is a Perl client used to update dynamic DNS entries for
-accounts on many dynamic DNS services.
+This plugin offers legacy ddclient perl backend wrapper support for the Dynamic DNS suite.
 
 Plugin Changelog
 ================

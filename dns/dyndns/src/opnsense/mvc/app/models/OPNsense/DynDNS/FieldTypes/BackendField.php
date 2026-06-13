@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2023 Deciso B.V.
+ * Copyright (C) 2026 Deciso B.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,41 +29,26 @@
 namespace OPNsense\DynDNS\FieldTypes;
 
 use OPNsense\Base\FieldTypes\BaseListField;
-use OPNsense\Core\Backend;
 
-class ServiceField extends BaseListField
+class BackendField extends BaseListField
 {
     private static $internalCacheOptionList = [];
 
     protected function actionPostLoadingEvent()
     {
         if (empty(self::$internalCacheOptionList)) {
-            // request supported services from backend
-            if ((string)$this->getParentModel()->general->backend == 'opnsense') {
-                $supported = json_decode((new Backend())->configdRun("ddclient opnbackend supported"), true);
-                if (!empty($supported)) {
-                    self::$internalCacheOptionList = $supported;
-                    asort(self::$internalCacheOptionList, SORT_NATURAL | SORT_FLAG_CASE);
-                }
+            if (is_file('/usr/local/sbin/ddclient')) {
+                self::$internalCacheOptionList['ddclient'] = gettext('ddclient');
+            }
+            if (is_file('/usr/local/opnsense/scripts/ddclient/ddclient_opn.py')) {
+                self::$internalCacheOptionList['opnsense'] = gettext('native');
             }
         }
         $this->internalOptionList = self::$internalCacheOptionList;
     }
 
-    /**
-     * setter for option values
-     * @param $data
-     */
     public function setOptionValues($data)
     {
-        if (!empty(self::$internalCacheOptionList) || (string)$this->getParentModel()->general->backend == 'opnsense') {
-            return;
-        }
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                self::$internalCacheOptionList[$key] = gettext($value);
-            }
-            $this->internalOptionList = self::$internalCacheOptionList;
-        }
+        // Handled dynamically in actionPostLoadingEvent.
     }
 }

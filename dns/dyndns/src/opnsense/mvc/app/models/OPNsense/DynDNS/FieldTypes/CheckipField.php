@@ -42,7 +42,13 @@ class CheckipField extends BaseListField
             return;
         }
         if (is_array($data)) {
-            $opn_backend = (string)$this->getParentModel()->general->backend == 'opnsense';
+            $backend = (string)$this->getParentModel()->general->backend;
+            if ($backend == 'ddclient' && !is_file('/usr/local/sbin/ddclient')) {
+                $backend = 'opnsense';
+            } elseif ($backend == 'opnsense' && !is_file('/usr/local/opnsense/scripts/ddclient/ddclient_opn.py')) {
+                $backend = 'ddclient';
+            }
+            $opn_backend = $backend == 'opnsense';
             foreach ($data as $key => $value) {
                 self::$internalCacheOptionList[$key] = gettext($value);
             }

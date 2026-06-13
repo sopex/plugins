@@ -22,14 +22,10 @@
                 <MinimumValue>1</MinimumValue>
                 <MaximumValue>86400</MaximumValue>
             </daemon_delay>
-            <backend type="OptionField">
+            <backend type=".\BackendField">
                 <Required>Y</Required>
                 <Default>opnsense</Default>
                 <ValidationMessage>A backend is required.</ValidationMessage>
-                <OptionValues>
-                    <ddclient>ddclient</ddclient>
-                    <opnsense>native</opnsense>
-                </OptionValues>
             </backend>
         </general>
         <accounts>

@@ -37,6 +37,13 @@ function ddclient_services()
     }
 
     if ($is_enabled) {
+        $backend = (string)$cnf->OPNsense->DynDNS->general->backend;
+        if ($backend == 'ddclient' && !is_file('/usr/local/sbin/ddclient')) {
+            $backend = 'opnsense';
+        } elseif ($backend == 'opnsense' && !is_file('/usr/local/opnsense/scripts/ddclient/ddclient_opn.py')) {
+            $backend = 'ddclient';
+        }
+
         $service = [
             'description' => gettext('ddclient'),
             'configd' => [
@@ -46,7 +53,7 @@ function ddclient_services()
             ],
             'name' => 'ddclient',
         ];
-        $service['pidfile'] = $cnf->OPNsense->DynDNS->general->backend != 'opnsense' ? '/var/run/ddclient.pid' : '/var/run/ddclient_opn.pid';
+        $service['pidfile'] = $backend != 'opnsense' ? '/var/run/ddclient.pid' : '/var/run/ddclient_opn.pid';
         $services[] = $service;
     }
 
