@@ -8,6 +8,7 @@ PLUGIN_VARIANTS=	amd intel
 amd_NAME=		cpu-microcode-amd
 amd_DEPENDS=		cpu-microcode-amd
 amd_COMMENT:=		AMD ${PLUGIN_COMMENT}
+amd_TIER=		2
 
 intel_NAME=		cpu-microcode-intel
 intel_DEPENDS=		cpu-microcode-intel
