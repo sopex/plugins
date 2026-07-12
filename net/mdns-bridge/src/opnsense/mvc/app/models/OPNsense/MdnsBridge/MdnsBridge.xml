@@ -1,0 +1,44 @@
+<model>
+    <mount>//OPNsense/MdnsBridge</mount>
+    <version>1.0.0</version>
+    <description>mDNS Bridge settings</description>
+    <items>
+        <general>
+            <enabled type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </enabled>
+            <enablecarp type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </enablecarp>
+            <interfaces type="InterfaceField">
+                <Default>lan</Default>
+                <Required>Y</Required>
+                <Multiple>Y</Multiple>
+            </interfaces>
+            <disable_ipv4 type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </disable_ipv4>
+            <disable_ipv6 type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </disable_ipv6>
+            <filtermode type="OptionField">
+                <Default>none</Default>
+                <Required>Y</Required>
+                <OptionValues>
+                    <none>No filtering</none>
+                    <allow>Allow listed services only</allow>
+                    <deny>Deny listed services</deny>
+                </OptionValues>
+            </filtermode>
+            <filters type="CSVListField">
+                <Mask>/^_[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/u</Mask>
+                <MaskPerItem>Y</MaskPerItem>
+                <ValidationMessage>Filters must be mDNS service labels starting with an underscore, e.g. _ipp or _airplay.</ValidationMessage>
+            </filters>
+        </general>
+    </items>
+</model>
