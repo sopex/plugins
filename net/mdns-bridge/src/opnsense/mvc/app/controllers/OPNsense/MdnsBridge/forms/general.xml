@@ -1,0 +1,52 @@
+<form>
+    <field>
+        <type>header</type>
+        <label>General Settings</label>
+    </field>
+    <field>
+        <id>mdnsbridge.general.enabled</id>
+        <label>Enable</label>
+        <type>checkbox</type>
+        <help>Enable the mDNS bridge service.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.enablecarp</id>
+        <label>Enable CARP Failover</label>
+        <type>checkbox</type>
+        <help>Only run the service on the CARP master device.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.interfaces</id>
+        <label>Interfaces</label>
+        <type>select_multiple</type>
+        <help>Interfaces to bridge mDNS traffic between. At least 2 interfaces must be selected.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.disable_ipv4</id>
+        <label>Disable IPv4</label>
+        <type>checkbox</type>
+        <advanced>true</advanced>
+        <help>Do not bridge mDNS traffic over IPv4.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.disable_ipv6</id>
+        <label>Disable IPv6</label>
+        <type>checkbox</type>
+        <advanced>true</advanced>
+        <help>Do not bridge mDNS traffic over IPv6.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.filtermode</id>
+        <label>Filter Mode</label>
+        <type>dropdown</type>
+        <help>Optionally filter which mDNS services are bridged: allow only the listed services, or bridge everything except the listed services.</help>
+    </field>
+    <field>
+        <id>mdnsbridge.general.filters</id>
+        <label>Service Filters</label>
+        <type>select_multiple</type>
+        <style>tokenize</style>
+        <allownew>true</allownew>
+        <help>mDNS service labels to allow or deny, e.g. _ipp, _airplay, _googlecast.</help>
+    </field>
+</form>

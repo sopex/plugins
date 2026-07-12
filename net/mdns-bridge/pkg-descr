@@ -1,0 +1,16 @@
+mdns-bridge is a multicast DNS (mDNS) bridge daemon. It forwards mDNS
+traffic (Bonjour/zeroconf: AirPlay, AirPrint, Chromecast, HomeKit/Matter
+and similar) between network segments, supporting both IPv4 and IPv6 as
+well as filtering of the mDNS services allowed to cross segments.
+
+This plugin replaces the deprecated os-mdns-repeater plugin, which
+wrapped an abandoned daemon that only supported IPv4.
+
+WWW: https://github.com/dennypage/mdns-bridge
+
+Plugin Changelog
+================
+
+1.0
+
+* Initial release
