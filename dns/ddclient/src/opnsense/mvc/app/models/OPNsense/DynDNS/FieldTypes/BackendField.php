@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2022 Deciso B.V.
+ * Copyright (C) 2026 Deciso B.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,55 +26,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+namespace OPNsense\DynDNS\FieldTypes;
 
-function ddclient_services()
+use OPNsense\Base\FieldTypes\OptionField;
+
+class BackendField extends OptionField
 {
-    $services = [];
-    $cnf = \OPNsense\Core\Config::getInstance()->object();
-    $is_enabled = false;
-    if ($cnf->OPNsense && $cnf->OPNsense->DynDNS && $cnf->OPNsense->DynDNS->general) {
-        $is_enabled = $cnf->OPNsense->DynDNS->general->enabled == '1';
+    private static $is_ddclient = null;
+
+    public static function isDdclient($reset = false)
+    {
+        if (self::$is_ddclient === null || $reset) {
+            self::$is_ddclient = file_exists('/usr/local/opnsense/version/ddclient');
+        }
+        return self::$is_ddclient;
     }
 
-    if ($is_enabled) {
-        $service = [
-            'description' => gettext('ddclient'),
-            'configd' => [
-                'restart' => ['ddclient restart'],
-                'start' => ['ddclient start'],
-                'stop' => ['ddclient stop'],
-            ],
-            'name' => 'ddclient',
-        ];
-        $service['pidfile'] = file_exists('/usr/local/opnsense/version/ddclient') ?
-            '/var/run/ddclient.pid' : '/var/run/ddclient_opn.pid';
-        $services[] = $service;
+    private static function autoSelect()
+    {
+        return self::isDdclient() ? 'ddclient' : 'opnsense';
     }
 
-    return $services;
-}
+    protected function actionPostLoadingEvent()
+    {
+        $this->internalValue = self::autoSelect();
+        return parent::actionPostLoadingEvent();
+    }
 
-function ddclient_xmlrpc_sync()
-{
-    $result = [];
+    public function setValue($value)
+    {
+        $this->internalValue = self::autoSelect();
+        parent::setValue(self::autoSelect());
+    }
 
-    $result[] = [
-        'description' => gettext('ddclient'),
-        'section' => 'OPNsense.DynDNS',
-        'services' => ['ddclient'],
-        'id' => 'ddclient',
-    ];
+    public function getNodeData()
+    {
+        $this->internalValue = self::autoSelect();
+        return parent::getNodeData();
+    }
 
-    return $result;
-}
+    public function getValue(): string
+    {
+        return self::autoSelect();
+    }
 
-function ddclient_syslog()
-{
-    $logfacilities = [];
-
-    $logfacilities['ddclient'] = [
-        'facility' => ['ddclient'],
-    ];
-
-    return $logfacilities;
+    public function __toString()
+    {
+        return self::autoSelect();
+    }
 }

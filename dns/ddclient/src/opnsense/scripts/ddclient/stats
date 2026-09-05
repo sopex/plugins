@@ -35,7 +35,9 @@ filename_new = '/var/tmp/ddclient_opn.status'
 result = {"hosts": {}}
 
 # both ddclient and "opnsense" ddclient exist, only use old when currently in use
-if os.path.isfile(filename) and os.path.isfile(filename_new):
+if not os.path.isfile('/usr/local/opnsense/version/ddclient'):
+    filename = None
+elif os.path.isfile(filename) and os.path.isfile(filename_new):
     if os.path.getmtime(filename) < os.path.getmtime(filename_new):
         filename = None
 

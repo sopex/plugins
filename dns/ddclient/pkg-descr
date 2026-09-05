@@ -6,6 +6,10 @@ accounts on many dynamic DNS services.
 Plugin Changelog
 ================
 
+1.32
+
+* Split plugin into auto-select backend between "os-ddclient" and "os-dyndns"
+
 1.31
 
 * Add multiple hostname support for cloudflare (contributed by Maksim Tokarev)

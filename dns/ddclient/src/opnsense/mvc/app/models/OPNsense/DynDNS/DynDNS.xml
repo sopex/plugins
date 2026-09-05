@@ -22,10 +22,7 @@
                 <MinimumValue>1</MinimumValue>
                 <MaximumValue>86400</MaximumValue>
             </daemon_delay>
-            <backend type="OptionField">
-                <Required>Y</Required>
-                <Default>opnsense</Default>
-                <ValidationMessage>A backend is required.</ValidationMessage>
+            <backend type=".\BackendField" volatile="true">
                 <OptionValues>
                     <ddclient>ddclient</ddclient>
                     <opnsense>native</opnsense>
@@ -116,7 +113,7 @@
                 <resourceId type="TextField">
                     <Required>N</Required>
                     <Mask>/^[^\n]*$/</Mask>
-                    <ValidationMessage>resourceId contains invalid characters.</ValidationMessage>
+                    <ValidationMessage>ResourceId contains invalid characters.</ValidationMessage>
                 </resourceId>
                 <hostnames type="HostnameField">
                     <Required>Y</Required>
@@ -194,7 +191,7 @@
                     <Required>N</Required>
                     <Constraints>
                         <check001>
-                            <ValidationMessage>An interface is required for the selected check method</ValidationMessage>
+                            <ValidationMessage>An interface is required for the selected check method.</ValidationMessage>
                             <type>SetIfConstraint</type>
                             <field>checkip</field>
                             <check>if</check>
@@ -204,7 +201,7 @@
                 <description type="TextField">
                     <Required>N</Required>
                     <Mask>/^(.){1,255}$/u</Mask>
-                    <ValidationMessage>Description should be a string between 1 and 255 characters</ValidationMessage>
+                    <ValidationMessage>Description should be a string between 1 and 255 characters.</ValidationMessage>
                 </description>
                 <current_ip type="TextField" volatile="true"/>
                 <current_mtime type="TextField" volatile="true"/>
