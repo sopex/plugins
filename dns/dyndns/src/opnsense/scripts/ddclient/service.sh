@@ -32,32 +32,54 @@ BACKENDS=/usr/local/opnsense/scripts/ddclient/backends
 
 backend_hooks()
 {
+	_result=0
 	for HOOK in ${BACKENDS}/*.sh; do
 		if [ -f "${HOOK}" ]; then
-			/bin/sh "${HOOK}" "${1}"
+			/bin/sh "${HOOK}" "${1}" || _result=1
 		fi
 	done
+	return ${_result}
 }
+
+RESULT=0
 
 case "${1}" in
 start)
-	/usr/local/etc/rc.d/ddclient_opn start
-	backend_hooks start
+	/usr/local/etc/rc.d/ddclient_opn start || RESULT=1
+	backend_hooks start || RESULT=1
 	;;
 stop)
 	/usr/local/etc/rc.d/ddclient_opn onestop 2> /dev/null
-	backend_hooks stop
+	backend_hooks stop || RESULT=1
 	# a ddclient daemon may be left behind when os-ddclient was removed
-	pkill -F /var/run/ddclient.pid 2> /dev/null
+	PIDFILE=/var/run/ddclient.pid
+	if [ -f "${PIDFILE}" ]; then
+		PID=$(cat "${PIDFILE}" 2> /dev/null)
+		if [ -n "${PID}" ] && kill -0 "${PID}" 2> /dev/null; then
+			kill -TERM "${PID}" 2> /dev/null
+			for _ in $(jot 30 2> /dev/null || seq 1 30); do
+				if ! kill -0 "${PID}" 2> /dev/null; then
+					break
+				fi
+				sleep 1
+			done
+			if kill -0 "${PID}" 2> /dev/null; then
+				RESULT=1
+			fi
+		fi
+		if [ "${RESULT}" -eq 0 ]; then
+			rm -f "${PIDFILE}"
+		fi
+	fi
 	;;
 restart)
-	${0} stop
-	${0} start
+	"${0}" stop || exit $?
+	"${0}" start || RESULT=1
 	;;
 force)
 	rm -f /var/tmp/ddclient_opn.status
-	/usr/local/etc/rc.d/ddclient_opn restart 2> /dev/null
-	backend_hooks force
+	/usr/local/etc/rc.d/ddclient_opn restart 2> /dev/null || RESULT=1
+	backend_hooks force || RESULT=1
 	;;
 *)
 	echo "Usage: ${0} start|stop|restart|force" >&2
@@ -65,4 +87,4 @@ force)
 	;;
 esac
 
-exit 0
+exit ${RESULT}

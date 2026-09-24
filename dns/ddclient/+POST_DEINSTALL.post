@@ -1,6 +1,5 @@
 #!/bin/sh
 
 # fall back to the native backend, the ddclient binary may remain installed
-pkill -F /var/run/ddclient.pid > /dev/null 2>&1 || :
 configctl template reload OPNsense/ddclient > /dev/null 2>&1 || :
 configctl ddclient restart > /dev/null 2>&1 || :

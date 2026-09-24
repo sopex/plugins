@@ -37,22 +37,30 @@ class ServiceField extends BaseListField
 
     protected function actionPostLoadingEvent()
     {
-        if (empty(self::$internalCacheOptionList)) {
-            $backend = $this->getParentModel()->getBackend();
-            if ($backend['effective'] == 'ddclient') {
+        $backend = $this->getParentModel()->getBackend();
+        $effective = $backend['effective'] ?? 'opnsense';
+        if (empty(self::$internalCacheOptionList[$effective])) {
+            self::$internalCacheOptionList[$effective] = [];
+            if ($effective == 'ddclient') {
                 // services offered by os-ddclient
                 foreach ($backend['descriptor']['services'] ?? [] as $key => $value) {
-                    self::$internalCacheOptionList[$key] = gettext($value);
+                    self::$internalCacheOptionList[$effective][$key] = gettext($value);
                 }
             } else {
                 // request supported services from native backend
                 $supported = json_decode((new Backend())->configdRun("ddclient opnbackend supported"), true);
                 if (!empty($supported)) {
-                    self::$internalCacheOptionList = $supported;
-                    asort(self::$internalCacheOptionList, SORT_NATURAL | SORT_FLAG_CASE);
+                    self::$internalCacheOptionList[$effective] = $supported;
+                    asort(self::$internalCacheOptionList[$effective], SORT_NATURAL | SORT_FLAG_CASE);
                 }
             }
         }
-        $this->internalOptionList = self::$internalCacheOptionList;
+        $this->internalOptionList = self::$internalCacheOptionList[$effective];
+    }
+
+    public function getNodeData()
+    {
+        $this->actionPostLoadingEvent();
+        return parent::getNodeData();
     }
 }

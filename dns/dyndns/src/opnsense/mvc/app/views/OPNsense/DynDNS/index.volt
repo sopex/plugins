@@ -44,7 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
                                 service.append(
                                     ' ',
                                     $('<i class="fa fa-fw fa-exclamation-triangle text-danger"/>').attr(
-                                        'title', "{{ lang._('This service is not supported by the backend in use') }}"
+                                        'title', "{{ lang._('This account is not supported by the backend in use') }}"
                                     )
                                 );
                             }
@@ -83,18 +83,22 @@ POSSIBILITY OF SUCH DAMAGE.
                     ));
                 } else if (data.ddclient_available) {
                     messages.append($('<div class="alert alert-info" role="alert"/>').text(
-                        "{{ lang._('The native backend is in use. The os-ddclient plugin is installed but not used and can be removed, reinstall os-dyndns first to make sure it is kept.') }}"
+                        "{{ lang._('The native backend is in use. The os-ddclient plugin is installed but not used and can be removed.') }}"
                     ));
                 }
                 if (data.unsupported_accounts.length > 0) {
                     let list = $('<ul/>');
                     $.each(data.unsupported_accounts, function (idx, account) {
+                        let item = account.service;
+                        if (account.method) {
+                            item += ' (' + account.method + ')';
+                        }
                         list.append($('<li/>').text(
-                            account.service + ': ' + (account.description || account.hostnames)
+                            item + ': ' + (account.description || account.hostnames)
                         ));
                     });
                     messages.append($('<div class="alert alert-danger" role="alert"/>').text(
-                        "{{ lang._('The following accounts use a service the backend in use does not support and will not be updated:') }}"
+                        "{{ lang._('The following accounts use a service or method the backend in use does not support and will not be updated:') }}"
                     ).append(list));
                 }
             });

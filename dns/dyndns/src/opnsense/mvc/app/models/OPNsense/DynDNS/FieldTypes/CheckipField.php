@@ -34,29 +34,44 @@ use OPNsense\Core\Backend;
 class CheckipField extends BaseListField
 {
     private static $internalCacheOptionList = [];
+    private static $rawOptions = [];
 
     public function setOptionValues($data)
     {
-        if (!empty(self::$internalCacheOptionList)) {
-            $this->internalOptionList = self::$internalCacheOptionList;
+        if (is_array($data) && empty(self::$rawOptions)) {
+            self::$rawOptions = $data;
+        }
+        $backend = $this->getParentModel()->getBackend();
+        $effective = $backend['effective'] ?? 'opnsense';
+
+        if (!empty(self::$internalCacheOptionList[$effective])) {
+            $this->internalOptionList = self::$internalCacheOptionList[$effective];
             return;
         }
-        if (is_array($data)) {
-            $backend = $this->getParentModel()->getBackend();
-            foreach ($data as $key => $value) {
-                self::$internalCacheOptionList[$key] = gettext($value);
+
+        $source = is_array($data) ? $data : self::$rawOptions;
+        if (!empty($source)) {
+            self::$internalCacheOptionList[$effective] = [];
+            foreach ($source as $key => $value) {
+                self::$internalCacheOptionList[$effective][$key] = gettext($value);
             }
-            if ($backend['effective'] == 'opnsense') {
+            if ($effective == 'opnsense') {
                 // OPNsense backend, change interface label and add IPv6 option
-                self::$internalCacheOptionList['if'] = gettext("Interface [IPv4]");
-                self::$internalCacheOptionList['if6'] = gettext("Interface [IPv6]");
+                self::$internalCacheOptionList[$effective]['if'] = gettext("Interface [IPv4]");
+                self::$internalCacheOptionList[$effective]['if6'] = gettext("Interface [IPv6]");
             } else {
                 // hide methods the selected backend can not handle
                 foreach ($backend['descriptor']['unsupported_checkip'] ?? [] as $key) {
-                    unset(self::$internalCacheOptionList[$key]);
+                    unset(self::$internalCacheOptionList[$effective][$key]);
                 }
             }
-            $this->internalOptionList = self::$internalCacheOptionList;
+            $this->internalOptionList = self::$internalCacheOptionList[$effective];
         }
+    }
+
+    public function getNodeData()
+    {
+        $this->setOptionValues(null);
+        return parent::getNodeData();
     }
 }

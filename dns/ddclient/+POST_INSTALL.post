@@ -1,4 +1,20 @@
 #!/bin/sh
 
+# preserve os-dyndns so removing os-ddclient does not autoremove Dynamic DNS
+(
+	# wait for the pkg transaction lock to be released
+	SUFFIX=
+	for _ in $(jot 30 2> /dev/null || seq 1 30); do
+		if pkg info -e os-dyndns-devel > /dev/null 2>&1 || pkg info -e os-ddclient-devel > /dev/null 2>&1; then
+			SUFFIX=-devel
+		fi
+		if pkg set -y -A 0 os-dyndns${SUFFIX} > /dev/null 2>&1; then
+			/usr/local/opnsense/scripts/firmware/register.php install os-dyndns${SUFFIX} > /dev/null 2>&1 || :
+			break
+		fi
+		sleep 1
+	done
+) > /dev/null 2>&1 &
+
 # switch over to the ddclient backend when it is selected automatically
 configctl ddclient restart > /dev/null 2>&1 || :

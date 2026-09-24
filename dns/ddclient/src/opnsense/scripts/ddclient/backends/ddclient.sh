@@ -30,18 +30,17 @@ RCSCRIPT=/usr/local/etc/rc.d/ddclient
 
 [ -x ${RCSCRIPT} ] || exit 0
 
+RESULT=0
+
 case "${1}" in
 start)
-	${RCSCRIPT} start
-	;;
-stop)
-	pkill -F /var/run/ddclient.pid 2> /dev/null
+	${RCSCRIPT} start || RESULT=$?
 	;;
 force)
 	if ${RCSCRIPT} enabled; then
-		/usr/local/sbin/ddclient -force
+		/usr/local/sbin/ddclient -force || RESULT=$?
 	fi
 	;;
 esac
 
-exit 0
+exit ${RESULT}

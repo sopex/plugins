@@ -76,13 +76,16 @@ class DynDNS extends BaseModel
     }
 
     /**
-     * @return array accounts (uuid => node) using a service not offered by the backend in use
+     * @return array accounts (uuid => node) using a service or checkip method not offered by the backend in use
      */
     public function getUnsupportedAccounts()
     {
         $result = [];
         foreach ($this->accounts->account->iterateItems() as $uuid => $account) {
-            if (!isset($account->service->getNodeData()[(string)$account->service])) {
+            if (
+                !isset($account->service->getNodeData()[(string)$account->service]) ||
+                !isset($account->checkip->getNodeData()[(string)$account->checkip])
+            ) {
                 $result[$uuid] = $account;
             }
         }

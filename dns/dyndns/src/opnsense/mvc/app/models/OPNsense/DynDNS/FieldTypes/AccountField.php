@@ -51,7 +51,7 @@ class AccountField extends ArrayField
                 if (!empty(self::$current_stats[$hostname]) && !empty(self::$current_stats[$hostname]['ip'])) {
                     $stats = self::$current_stats[$hostname];
                     $node->current_ip->setValue($stats['ip']);
-                    $node->current_mtime->setValue(date('c', $stats['mtime']));
+                    $node->current_mtime->setValue(date('c', (int)$stats['mtime']));
                     break;
                 }
             }

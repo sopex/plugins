@@ -5,8 +5,7 @@ many dynamic DNS services.
 This plugin is deprecated and will be removed in a future release,
 please use the native backend of os-dyndns instead.  To switch, select
 the native backend in Services: Dynamic DNS: General settings and verify
-your accounts are updated.  Then reinstall os-dyndns from the plugins
-page so it is kept and remove os-ddclient.
+your accounts are updated.  Then remove os-ddclient.
 
 Plugin Changelog
 ================

@@ -57,9 +57,11 @@ class SettingsController extends ApiMutableModelControllerBase
         $backend = $mdl->getBackend();
         $unsupported = [];
         foreach ($mdl->getUnsupportedAccounts() as $uuid => $account) {
+            $unsupported_method = !isset($account->checkip->getNodeData()[(string)$account->checkip]);
             $unsupported[] = [
                 'uuid' => $uuid,
                 'service' => (string)$account->service,
+                'method' => $unsupported_method ? (string)$account->checkip : null,
                 'description' => (string)$account->description,
                 'hostnames' => (string)$account->hostnames,
             ];
