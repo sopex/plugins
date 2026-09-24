@@ -83,7 +83,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     ));
                 } else if (data.ddclient_available) {
                     messages.append($('<div class="alert alert-info" role="alert"/>').text(
-                        "{{ lang._('The native backend is in use. The os-ddclient plugin is installed but not used and can be removed.') }}"
+                        "{{ lang._('The native backend is in use. The os-ddclient plugin is installed but not used and can be removed, reinstall os-dyndns first to make sure it is kept.') }}"
                     ));
                 }
                 if (data.unsupported_accounts.length > 0) {

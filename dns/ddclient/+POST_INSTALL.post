@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# switch over to the ddclient backend when it is selected automatically
+configctl ddclient restart > /dev/null 2>&1 || :

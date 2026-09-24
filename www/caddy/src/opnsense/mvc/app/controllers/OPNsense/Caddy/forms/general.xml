@@ -160,7 +160,7 @@
             <id>caddy.general.TlsDnsProvider</id>
             <label>DNS Provider</label>
             <type>dropdown</type>
-            <help>Select the DNS Provider. If you cannot find your provider here, consider using os-acme-client for the DNS-01 Challenge and os-ddclient for Dynamic DNS as alternatives.</help>
+            <help>Select the DNS Provider. If you cannot find your provider here, consider using os-acme-client for the DNS-01 Challenge and os-dyndns for Dynamic DNS as alternatives.</help>
         </field>
         <field>
             <id>caddy.general.TlsDnsApiKey</id>
