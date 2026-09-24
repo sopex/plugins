@@ -1,7 +1,6 @@
-{% if not helpers.empty('OPNsense.DynDNS.general.enabled') and OPNsense.DynDNS.general.backend == 'ddclient' %}
-ddclient_enable="YES"
-ddclient_setup="/usr/local/opnsense/scripts/ddclient/setup.sh"
-ddclient_flags="-daemon {{OPNsense.DynDNS.general.daemon_delay|default('300')}}"
+{% from 'OPNsense/ddclient/backend.macro' import effective_backend %}
+{% if not helpers.empty('OPNsense.DynDNS.general.enabled') and effective_backend() == 'ddclient' %}
+{%   include 'OPNsense/ddclient/legacy/rc.conf.d' ignore missing %}
 {% else %}
 ddclient_enable="NO"
 {% endif %}

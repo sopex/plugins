@@ -37,17 +37,18 @@ function ddclient_services()
     }
 
     if ($is_enabled) {
-        $service = [
-            'description' => gettext('ddclient'),
+        $backend = \OPNsense\DynDNS\DynDNS::backendInfo((string)$cnf->OPNsense->DynDNS->general->backend);
+        $is_ddclient = $backend['effective'] == 'ddclient';
+        $services[] = [
+            'description' => $is_ddclient ? gettext('Dynamic DNS (ddclient)') : gettext('Dynamic DNS'),
             'configd' => [
                 'restart' => ['ddclient restart'],
                 'start' => ['ddclient start'],
                 'stop' => ['ddclient stop'],
             ],
             'name' => 'ddclient',
+            'pidfile' => $is_ddclient ? ($backend['descriptor']['pidfile'] ?? '/var/run/ddclient.pid') : '/var/run/ddclient_opn.pid',
         ];
-        $service['pidfile'] = $cnf->OPNsense->DynDNS->general->backend != 'opnsense' ? '/var/run/ddclient.pid' : '/var/run/ddclient_opn.pid';
-        $services[] = $service;
     }
 
     return $services;
@@ -58,7 +59,7 @@ function ddclient_xmlrpc_sync()
     $result = [];
 
     $result[] = [
-        'description' => gettext('ddclient'),
+        'description' => gettext('Dynamic DNS'),
         'section' => 'OPNsense.DynDNS',
         'services' => ['ddclient'],
         'id' => 'ddclient',

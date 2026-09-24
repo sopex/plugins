@@ -1,6 +1,8 @@
 {% from 'OPNsense/Macros/interface.macro' import physical_interface %}
+{% from 'OPNsense/ddclient/backend.macro' import effective_backend %}
 {
     "general": {
+        "backend": "{{ effective_backend() }}",
         "enabled": {{ "true" if not helpers.empty('OPNsense.DynDNS.general.enabled') else "false" }},
         "verbose": {{ "true" if not helpers.empty('OPNsense.DynDNS.general.verbose') else "false" }},
         "allowipv6": {{ "true" if not helpers.empty('OPNsense.DynDNS.general.allowipv6') else "false" }},

@@ -43,15 +43,17 @@ class AccountsController extends ApiMutableModelControllerBase
         $result = $this->searchBase(
             "accounts.account",
             [
-              'enabled', 'service', 'description', 'username', 'hostnames', 'use_interface',
+              'enabled', 'service', 'description', 'username', 'hostnames',
               'interface', 'protocol', 'current_ip', 'current_mtime'
             ],
             "description"
         );
+        $unsupported = $this->getModel()->getUnsupportedAccounts();
         foreach ($result['rows'] as &$row) {
             if ($row['service'] == 'Custom') {
                 $row['service'] = 'Custom (' . $row['protocol'] . ')';
             }
+            $row['supported'] = !isset($unsupported[$row['uuid']]);
             unset($row['protocol']);
         }
         return $result;

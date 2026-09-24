@@ -24,36 +24,34 @@
     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
+
+    --------------------------------------------------------------------------------------
+    parse the ddclient cache file, called by ../stats when the ddclient backend is in use
 """
 
 import os
-import sys
 import json
-import subprocess
 
-config_filename = '/usr/local/etc/ddclient.json'
-status_filename = '/var/tmp/ddclient_opn.status'
-backends_dir = '/usr/local/opnsense/scripts/ddclient/backends'
-
-# the backend in use is resolved by the template generating our configuration
-backend = 'opnsense'
-if os.path.isfile(config_filename):
-    try:
-        with open(config_filename) as f:
-            backend = json.load(f).get('general', {}).get('backend', 'opnsense')
-    except ValueError:
-        pass
-
-backend_stats = '%s/%s_stats' % (backends_dir, backend)
-if backend != 'opnsense' and os.path.isfile(backend_stats):
-    sys.stdout.write(subprocess.run([sys.executable, backend_stats], capture_output=True, text=True).stdout)
-    sys.exit(0)
+filename = '/var/tmp/ddclient.cache'
 
 result = {"hosts": {}}
-if os.path.isfile(status_filename):
-    # output will look completely different when our implementation is used, the model knows how to parse this
-    # (see AccountField.php)
-    with open(status_filename) as f:
-        result = json.load(f)
+
+if os.path.isfile(filename):
+    with open(filename, "r") as fhandle:
+        for idx, row in enumerate(fhandle):
+            if idx == 0:
+                result['version'] = row.strip('#\n ')
+            elif idx == 1:
+                tmp = row.split('(')[-1].split(')')[0]
+                if tmp.isdigit():
+                    result['updated'] = int(tmp)
+            elif row.startswith('#') is False:
+                record = {}
+                for pair in row.split(','):
+                    parts = pair.split('=')
+                    if len(parts) == 2:
+                        record[parts[0]] = parts[1]
+                if 'host' in record:
+                    result['hosts'][record['host']] = record
 
 print(json.dumps(result))

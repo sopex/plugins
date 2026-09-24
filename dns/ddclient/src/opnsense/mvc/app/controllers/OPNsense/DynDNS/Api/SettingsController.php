@@ -46,4 +46,33 @@ class SettingsController extends ApiMutableModelControllerBase
             ]
         ];
     }
+
+    /**
+     * backend in use and the accounts it can not serve
+     * @return array
+     */
+    public function backendAction()
+    {
+        $mdl = $this->getModel();
+        $backend = $mdl->getBackend();
+        $unsupported = [];
+        foreach ($mdl->getUnsupportedAccounts() as $uuid => $account) {
+            $unsupported[] = [
+                'uuid' => $uuid,
+                'service' => (string)$account->service,
+                'description' => (string)$account->description,
+                'hostnames' => (string)$account->hostnames,
+            ];
+        }
+        return [
+            'configured' => $backend['configured'],
+            'effective' => $backend['effective'],
+            'ddclient_available' => $backend['ddclient_available'],
+            'fallback' => $backend['fallback'],
+            'deprecated' => !empty($backend['descriptor']['deprecated']) && $backend['effective'] == 'ddclient',
+            'unsupported_fields' => $backend['effective'] == 'ddclient' ?
+                ($backend['descriptor']['unsupported_fields'] ?? []) : [],
+            'unsupported_accounts' => $unsupported,
+        ];
+    }
 }

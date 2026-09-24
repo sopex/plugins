@@ -30,7 +30,6 @@
       Route53 Hosted Zone ID: zone
 """
 import syslog
-import boto3
 from . import BaseAccount
 
 
@@ -59,6 +58,8 @@ class AWS(BaseAccount):
                     f"No address found for {self.description}"
                 )
                 return False
+            # import on use, only this provider depends on boto3 which is slow to load
+            import boto3
             client = boto3.client('route53',
                                   aws_access_key_id = self.settings.get('username'),
                                   aws_secret_access_key = self.settings.get('password'))

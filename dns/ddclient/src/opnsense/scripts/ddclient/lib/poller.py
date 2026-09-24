@@ -47,7 +47,12 @@ class AccountFactory:
         pkg_name = "%s.account" % __name__[:-len(os.path.splitext(os.path.basename(__file__))[0])-1]
         all_account_classes = list()
         for filename in glob.glob("%s/account/*.py" % os.path.dirname(__file__)):
-            importlib.import_module(".%s" % os.path.splitext(os.path.basename(filename))[0], pkg_name)
+            module_name = os.path.splitext(os.path.basename(filename))[0]
+            try:
+                importlib.import_module(".%s" % module_name, pkg_name)
+            except Exception as e:
+                # a broken provider should not take down the other ones
+                syslog.syslog(syslog.LOG_ERR, "Unable to load provider %s (%s)" % (module_name, e))
 
         for module_name in dir(sys.modules[pkg_name]):
             for attribute_name in dir(getattr(sys.modules[pkg_name], module_name)):
@@ -113,9 +118,9 @@ class Poller:
                                 syslog.LOG_NOTICE,
                                 "Account %s uses %s for service" % (acc.description, acc.__class__.__name__)
                             )
-                    elif self.is_verbose:
+                    else:
                         syslog.syslog(
-                            syslog.LOG_NOTICE,
+                            syslog.LOG_WARNING,
                             "Unable to find a suitable target for account %(id)s [%(description)s]" % account
                         )
         if len(self._accounts) > 0 and os.path.isfile(self._status_filename):

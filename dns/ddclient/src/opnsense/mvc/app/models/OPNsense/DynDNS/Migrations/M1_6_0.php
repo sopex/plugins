@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2023 Deciso B.V.
+ * Copyright (C) 2026 Deciso B.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,37 +26,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace OPNsense\DynDNS\FieldTypes;
+namespace OPNsense\DynDNS\Migrations;
 
-use OPNsense\Base\FieldTypes\BaseListField;
-use OPNsense\Core\Backend;
+use OPNsense\Base\BaseModelMigration;
+use OPNsense\Core\Config;
 
-class CheckipField extends BaseListField
+class M1_6_0 extends BaseModelMigration
 {
-    private static $internalCacheOptionList = [];
-
-    public function setOptionValues($data)
+    /**
+     * The backend became optional (empty means automatic, following the installed packages).
+     * Existing setups keep the backend they were using, which defaulted to the native one.
+     * @param $model
+     */
+    public function run($model)
     {
-        if (!empty(self::$internalCacheOptionList)) {
-            $this->internalOptionList = self::$internalCacheOptionList;
+        $config = Config::getInstance()->object();
+
+        if (empty($config->OPNsense->DynDNS)) {
             return;
         }
-        if (is_array($data)) {
-            $backend = $this->getParentModel()->getBackend();
-            foreach ($data as $key => $value) {
-                self::$internalCacheOptionList[$key] = gettext($value);
-            }
-            if ($backend['effective'] == 'opnsense') {
-                // OPNsense backend, change interface label and add IPv6 option
-                self::$internalCacheOptionList['if'] = gettext("Interface [IPv4]");
-                self::$internalCacheOptionList['if6'] = gettext("Interface [IPv6]");
-            } else {
-                // hide methods the selected backend can not handle
-                foreach ($backend['descriptor']['unsupported_checkip'] ?? [] as $key) {
-                    unset(self::$internalCacheOptionList[$key]);
-                }
-            }
-            $this->internalOptionList = self::$internalCacheOptionList;
+
+        if (empty((string)$config->OPNsense->DynDNS->general->backend)) {
+            $model->general->backend = 'opnsense';
         }
     }
 }

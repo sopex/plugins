@@ -37,10 +37,74 @@ use OPNsense\Base\Messages\Message;
  */
 class DynDNS extends BaseModel
 {
+    /* shipped by os-ddclient, keep in sync with service/templates/OPNsense/ddclient/backend.macro */
+    const DDCLIENT_DESCRIPTOR = '/usr/local/opnsense/scripts/ddclient/backends/ddclient.json';
+    const DDCLIENT_BINARY = '/usr/local/sbin/ddclient';
+
+    private static $backendCache = [];
+
+    /**
+     * Resolve the backend in use. The ddclient backend is only available when os-ddclient is installed,
+     * an empty (automatic) selection picks it when present, otherwise the native backend is used.
+     * @param string $configured configured backend ('', 'opnsense' or 'ddclient')
+     * @return array
+     */
+    public static function backendInfo($configured)
+    {
+        $configured = (string)$configured;
+        if (!isset(self::$backendCache[$configured])) {
+            $available = file_exists(self::DDCLIENT_DESCRIPTOR) && file_exists(self::DDCLIENT_BINARY);
+            $descriptor = $available ? json_decode(file_get_contents(self::DDCLIENT_DESCRIPTOR), true) : null;
+            $effective = $available && in_array($configured, ['', 'ddclient']) ? 'ddclient' : 'opnsense';
+            self::$backendCache[$configured] = [
+                'configured' => $configured,
+                'effective' => $effective,
+                'ddclient_available' => $available,
+                'fallback' => $configured == 'ddclient' && !$available,
+                'descriptor' => is_array($descriptor) ? $descriptor : [],
+            ];
+        }
+        return self::$backendCache[$configured];
+    }
+
+    /**
+     * @return array backend information for the current configuration
+     */
+    public function getBackend()
+    {
+        return self::backendInfo((string)$this->general->backend);
+    }
+
+    /**
+     * @return array accounts (uuid => node) using a service not offered by the backend in use
+     */
+    public function getUnsupportedAccounts()
+    {
+        $result = [];
+        foreach ($this->accounts->account->iterateItems() as $uuid => $account) {
+            if (!isset($account->service->getNodeData()[(string)$account->service])) {
+                $result[$uuid] = $account;
+            }
+        }
+        return $result;
+    }
+
     public function performValidation($validateFullModel = false)
     {
         $messages = parent::performValidation($validateFullModel);
         $validate_servers = [];
+
+        if (
+            ($validateFullModel || $this->general->backend->isFieldChanged()) &&
+            $this->general->backend->isEqual('ddclient') && !$this->getBackend()['ddclient_available']
+        ) {
+            $messages->appendMessage(
+                new Message(
+                    gettext('The ddclient backend requires the os-ddclient plugin to be installed.'),
+                    'general.backend'
+                )
+            );
+        }
 
         foreach ($this->getFlatNodes() as $key => $node) {
             $tagName = $node->getInternalXMLTagName();

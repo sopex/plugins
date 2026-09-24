@@ -38,8 +38,14 @@ class ServiceField extends BaseListField
     protected function actionPostLoadingEvent()
     {
         if (empty(self::$internalCacheOptionList)) {
-            // request supported services from backend
-            if ((string)$this->getParentModel()->general->backend == 'opnsense') {
+            $backend = $this->getParentModel()->getBackend();
+            if ($backend['effective'] == 'ddclient') {
+                // services offered by os-ddclient
+                foreach ($backend['descriptor']['services'] ?? [] as $key => $value) {
+                    self::$internalCacheOptionList[$key] = gettext($value);
+                }
+            } else {
+                // request supported services from native backend
                 $supported = json_decode((new Backend())->configdRun("ddclient opnbackend supported"), true);
                 if (!empty($supported)) {
                     self::$internalCacheOptionList = $supported;
@@ -48,22 +54,5 @@ class ServiceField extends BaseListField
             }
         }
         $this->internalOptionList = self::$internalCacheOptionList;
-    }
-
-    /**
-     * setter for option values
-     * @param $data
-     */
-    public function setOptionValues($data)
-    {
-        if (!empty(self::$internalCacheOptionList) || (string)$this->getParentModel()->general->backend == 'opnsense') {
-            return;
-        }
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                self::$internalCacheOptionList[$key] = gettext($value);
-            }
-            $this->internalOptionList = self::$internalCacheOptionList;
-        }
     }
 }

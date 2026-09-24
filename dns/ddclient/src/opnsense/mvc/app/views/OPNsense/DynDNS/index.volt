@@ -35,14 +35,77 @@ POSSIBILITY OF SUCH DAMAGE.
                 set:'/api/dyndns/accounts/set_item/',
                 add:'/api/dyndns/accounts/add_item/',
                 del:'/api/dyndns/accounts/del_item/',
-                toggle:'/api/dyndns/accounts/toggle_item/'
+                toggle:'/api/dyndns/accounts/toggle_item/',
+                options: {
+                    formatters: {
+                        service: function (column, row) {
+                            let service = $('<span/>').text(row.service);
+                            if (row.supported === false) {
+                                service.append(
+                                    ' ',
+                                    $('<i class="fa fa-fw fa-exclamation-triangle text-danger"/>').attr(
+                                        'title', "{{ lang._('This service is not supported by the backend in use') }}"
+                                    )
+                                );
+                            }
+                            return service.prop('outerHTML');
+                        }
+                    }
+                }
             }
         );
+
+        let active_backend = null;
+        function updateBackendStatus() {
+            ajaxGet('/api/dyndns/settings/backend', {}, function (data, status) {
+                if (data.effective === undefined) {
+                    return;
+                } else if (active_backend !== null && active_backend !== data.effective) {
+                    // options and services offered depend on the backend, start over
+                    window.location.reload();
+                    return;
+                }
+                active_backend = data.effective;
+                let messages = $('#backendStatus').empty();
+                // backend selection only makes sense when os-ddclient offers an alternative
+                $('#ddclient\\.general\\.backend').closest('tr').toggle(data.ddclient_available || data.fallback);
+                // hide options the backend in use can not handle, also from the advanced mode toggle
+                $.each(data.unsupported_fields, function (idx, field) {
+                    $('#account\\.' + field).prop('disabled', true).closest('tr').removeAttr('data-advanced').hide();
+                });
+                if (data.fallback) {
+                    messages.append($('<div class="alert alert-danger" role="alert"/>').text(
+                        "{{ lang._('The ddclient backend is selected, but the os-ddclient plugin is not installed. The native backend is used instead.') }}"
+                    ));
+                } else if (data.deprecated) {
+                    messages.append($('<div class="alert alert-warning" role="alert"/>').text(
+                        "{{ lang._('The ddclient backend is in use. It is deprecated and will be removed in a future release, please consider switching to the native backend.') }}"
+                    ));
+                } else if (data.ddclient_available) {
+                    messages.append($('<div class="alert alert-info" role="alert"/>').text(
+                        "{{ lang._('The native backend is in use. The os-ddclient plugin is installed but not used and can be removed.') }}"
+                    ));
+                }
+                if (data.unsupported_accounts.length > 0) {
+                    let list = $('<ul/>');
+                    $.each(data.unsupported_accounts, function (idx, account) {
+                        list.append($('<li/>').text(
+                            account.service + ': ' + (account.description || account.hostnames)
+                        ));
+                    });
+                    messages.append($('<div class="alert alert-danger" role="alert"/>').text(
+                        "{{ lang._('The following accounts use a service the backend in use does not support and will not be updated:') }}"
+                    ).append(list));
+                }
+            });
+        }
+
         let data_get_map = {'frm_settings':"/api/dyndns/settings/get"};
         mapDataToFormUI(data_get_map).done(function(){
             formatTokenizersUI();
             $('.selectpicker').selectpicker('refresh');
             updateServiceControlUI('dyndns');
+            updateBackendStatus();
         });
 
         $("#reconfigureAct").SimpleActionButton({
@@ -55,6 +118,7 @@ POSSIBILITY OF SUCH DAMAGE.
           },
           onAction: function(data, status) {
               updateServiceControlUI('dyndns');
+              updateBackendStatus();
           }
         });
         $("#account\\.service").change(function(){
@@ -92,6 +156,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 </script>
 
+<div id="backendStatus"></div>
 <ul class="nav nav-tabs" data-tabs="tabs" id="maintabs">
     <li class="active"><a data-toggle="tab" id="destinations" href="#tab_accounts">{{ lang._('Accounts') }}</a></li>
     <li><a data-toggle="tab" href="#settings" id="settings_tab">{{ lang._('General settings') }}</a></li>
@@ -104,7 +169,7 @@ POSSIBILITY OF SUCH DAMAGE.
             <tr>
                 <th data-column-id="uuid" data-type="string" data-identifier="true"  data-visible="false">{{ lang._('ID') }}</th>
                 <th data-column-id="enabled" data-width="6em" data-type="string" data-formatter="rowtoggle">{{ lang._('Enabled') }}</th>
-                <th data-column-id="service" data-type="string">{{ lang._('Service') }}</th>
+                <th data-column-id="service" data-type="string" data-formatter="service">{{ lang._('Service') }}</th>
                 <th data-column-id="hostnames" data-type="string">{{ lang._('Hostnames') }}</th>
                 <th data-column-id="username" data-type="string">{{ lang._('Username') }}</th>
                 <th data-column-id="interface" data-type="string">{{ lang._('Interface') }}</th>

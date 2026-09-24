@@ -29,6 +29,6 @@
         <id>ddclient.general.backend</id>
         <label>Backend</label>
         <type>dropdown</type>
-        <help>Select the backend to use.</help>
+        <help>Select the backend to use, automatic uses ddclient as long as os-ddclient is installed and the native backend otherwise.</help>
     </field>
 </form>

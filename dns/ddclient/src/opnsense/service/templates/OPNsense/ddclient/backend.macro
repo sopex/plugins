@@ -1,0 +1,14 @@
+{#
+    Resolve the backend in use. The ddclient backend is only available when os-ddclient is installed,
+    an empty (automatic) selection picks it when present, otherwise the native backend is used.
+    Keep in sync with OPNsense\DynDNS\DynDNS::backendInfo()
+#}
+{% macro effective_backend() -%}
+{%   set configured = helpers.getNodeByTag('OPNsense.DynDNS.general.backend') or '' -%}
+{%   if helpers.file_exists('/usr/local/opnsense/scripts/ddclient/backends/ddclient.json') and
+        helpers.file_exists('/usr/local/sbin/ddclient') and configured in ['', 'ddclient'] -%}
+ddclient
+{%-   else -%}
+opnsense
+{%-   endif -%}
+{%- endmacro %}
