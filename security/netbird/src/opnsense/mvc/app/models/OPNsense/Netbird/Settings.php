@@ -119,8 +119,14 @@ class Settings extends BaseModel
 
         $config["DisableDNS"] = $this->dns->enable->__toString() != '1';
         $customDns = trim($this->dns->customAddress->__toString());
-        if ($customDns === '' && $this->dns->unboundForward->__toString() == '1') {
-            $customDns = '127.0.0.1:5053';
+        if ($customDns !== '') {
+            if ($customDns[0] === '[') {
+                if (strpos($customDns, ']:') === false) {
+                    $customDns .= ':53';
+                }
+            } elseif (strpos($customDns, ':') === false) {
+                $customDns .= ':53';
+            }
         }
         $config["CustomDNSAddress"] = $customDns;
 
@@ -160,5 +166,100 @@ class Settings extends BaseModel
             syslog(LOG_ERR, "netbird: failed to rename $tmpFile to $target");
             return;
         }
+    }
+
+    public function detectDnsResolver(string $cidrHint = '', bool $useLogFallback = false): string
+    {
+        if ($cidrHint !== '') {
+            if (strpos($cidrHint, '/') !== false) {
+                [$ip, $prefix] = explode('/', $cidrHint, 2);
+                $ipLong = ip2long(trim($ip));
+                $prefixTrim = trim($prefix);
+                $prefixLen = ctype_digit($prefixTrim) ? (int)$prefixTrim : -1;
+                if ($ipLong !== false && $prefixLen >= 8 && $prefixLen <= 30) {
+                    $hostBits = 32 - $prefixLen;
+                    $bcastLong = ($ipLong | ((1 << $hostBits) - 1)) & 0xFFFFFFFF;
+                    $dnsIp = long2ip($bcastLong - 1);
+                    if ($dnsIp !== false) {
+                        return $dnsIp . ':53';
+                    }
+                }
+            }
+            return '';
+        }
+
+        $wgIface = trim($this->general->interface->__toString());
+        if ($wgIface === '') {
+            $wgIface = 'wt0';
+        }
+
+        $out = [];
+        $rc = 0;
+        exec('/sbin/ifconfig ' . escapeshellarg($wgIface) . ' 2>/dev/null', $out, $rc);
+        if ($rc === 0) {
+            $ifconfig = implode("\n", $out);
+            if (preg_match('/\binet\s+(\d+\.\d+\.\d+\.\d+)\s+netmask\s+0x([0-9a-fA-F]{8})\b/', $ifconfig, $m)) {
+                $ipLong = ip2long($m[1]);
+                $maskLong = hexdec($m[2]);
+                if ($ipLong !== false && $maskLong >= 0xFF000000 && $maskLong <= 0xFFFFFFFC) {
+                    $bcastLong = ($ipLong | (~$maskLong & 0xFFFFFFFF)) & 0xFFFFFFFF;
+                    $dnsIp = long2ip($bcastLong - 1);
+                    if ($dnsIp !== false) {
+                        return $dnsIp . ':53';
+                    }
+                }
+            }
+        }
+
+        if ($useLogFallback) {
+            $logFile = '/var/log/netbird/latest.log';
+            if (is_readable($logFile)) {
+                $size = @filesize($logFile);
+                $offset = ($size !== false && $size > 65536) ? ($size - 65536) : 0;
+                $tail = @file_get_contents($logFile, false, null, $offset);
+                if (is_string($tail) && preg_match_all('/Netbird engine started, the IP is:\s*(\d+\.\d+\.\d+\.\d+\/\d+)/', $tail, $matches)) {
+                    $lastCidr = end($matches[1]);
+                    if (is_string($lastCidr) && $lastCidr !== '') {
+                        return $this->detectDnsResolver($lastCidr, false);
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    public function shouldAutoUpdateDnsResolver(string $detectedResolver): bool
+    {
+        if ($detectedResolver === '') {
+            return false;
+        }
+
+        $current = trim($this->dns->customAddress->__toString());
+        if ($current === '') {
+            return true;
+        }
+
+        $normalized = $current;
+        if ($normalized[0] === '[') {
+            if (strpos($normalized, ']:') === false) {
+                $normalized .= ':53';
+            }
+        } elseif (strpos($normalized, ':') === false) {
+            $normalized .= ':53';
+        }
+
+        if ($normalized === $detectedResolver) {
+            return false;
+        }
+
+        if (preg_match('/^(\d+\.\d+\.\d+\.254):53$/', $normalized, $m)) {
+            $ipLong = ip2long($m[1]);
+            if ($ipLong !== false && (($ipLong & 0xFFC00000) === 0x64400000)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

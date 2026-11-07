@@ -106,8 +106,15 @@ try {
     stream_set_blocking($pipes[1], false);
     $output = '';
     $ssoPromptDetected = false;
+    $timedOut = false;
+    $deadline = microtime(true) + 30.0;
 
     while (!feof($pipes[1])) {
+        if (microtime(true) >= $deadline) {
+            $timedOut = true;
+            proc_terminate($process, 9);
+            break;
+        }
         $read = [$pipes[1]];
         $write = null;
         $except = null;
@@ -149,6 +156,11 @@ try {
 
     if ($ssoPromptDetected) {
         echo "Setup key is required to register this peer.\n";
+        exit(0);
+    }
+
+    if ($timedOut && trim($output) === '') {
+        echo "Timed out waiting for netbird up.\n";
         exit(0);
     }
 

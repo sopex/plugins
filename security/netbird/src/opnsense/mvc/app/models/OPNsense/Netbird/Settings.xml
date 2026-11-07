@@ -84,8 +84,8 @@
             </enable>
             <customAddress type="TextField">
                 <Required>N</Required>
-                <Mask>/^(?:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|\[[0-9a-fA-F:]+\]):(?:[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/u</Mask>
-                <ValidationMessage>Please specify a valid IP:port address (e.g. 127.0.0.1:5053).</ValidationMessage>
+                <Mask>/^(?:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|\[[0-9a-fA-F:]+\])(?::(?:[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?)?$/u</Mask>
+                <ValidationMessage>Please specify a valid IP or IP:port address (e.g. 100.64.255.254:53).</ValidationMessage>
             </customAddress>
             <unboundForward type="BooleanField">
                 <Default>0</Default>

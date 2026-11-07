@@ -110,14 +110,14 @@
         <id>settings.dns.customAddress</id>
         <label>DNS Resolver Address</label>
         <type>text</type>
-        <hint>127.0.0.1:5053</hint>
-        <help>Custom IP:port address for NetBird's local DNS resolver (defaults to 127.0.0.1:5053 when Unbound forwarding is enabled)</help>
+        <hint>100.64.255.254:53</hint>
+        <help>IP or IP:port address for NetBird's local DNS resolver (leave empty to auto-detect from the NetBird interface subnet when Unbound forwarding is enabled, e.g. 100.64.255.254:53)</help>
     </field>
     <field>
         <id>settings.dns.unboundForward</id>
         <label>Forward NetBird Domain in Unbound</label>
         <type>checkbox</type>
-        <help>Forward queries for the NetBird DNS domain in Unbound to NetBird's resolver address so LAN clients can resolve peer names</help>
+        <help>Forward queries for the NetBird DNS domain in Unbound to NetBird's resolver address so LAN clients can resolve peer names (requires NetBird mode in Traffic Handling)</help>
     </field>
     <field>
         <id>settings.dns.unboundDomain</id>

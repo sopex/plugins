@@ -35,6 +35,7 @@ use OPNsense\Base\ApiMutableModelControllerBase;
 use OPNsense\Core\Backend;
 use OPNsense\Core\Config;
 use OPNsense\Netbird\Authentication;
+use OPNsense\Netbird\Settings;
 
 /**
  * netbird authentication controller
@@ -79,8 +80,37 @@ class AuthenticationController extends ApiMutableModelControllerBase
         $connected = $status['management']['connected'] ?? false;
         if (json_last_error() === JSON_ERROR_NONE && $connected === true) {
             $cfg = Config::getInstance()->object();
-            if (isset($cfg->OPNsense->netbird->authentication->setupKey)) {
+            $cfgChanged = false;
+            if (isset($cfg->OPNsense->netbird->authentication->setupKey) && (string)$cfg->OPNsense->netbird->authentication->setupKey !== '') {
                 $cfg->OPNsense->netbird->authentication->setupKey = '';
+                $cfgChanged = true;
+            }
+
+            $settings = new Settings();
+            if ((string)$settings->dns->unboundForward === '1') {
+                $netbirdIp = trim((string)($status['netbirdIp'] ?? ''));
+                $detected = $netbirdIp !== '' ? $settings->detectDnsResolver($netbirdIp) : '';
+                if ($detected === '') {
+                    $detected = $settings->detectDnsResolver('', true);
+                }
+                if ($detected !== '' && $settings->shouldAutoUpdateDnsResolver($detected)) {
+                    $unboundConf = '/usr/local/etc/unbound.opnsense.d/netbird.conf';
+                    $beforeHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
+                    $settings->dns->customAddress = $detected;
+                    $settings->serializeToConfig();
+                    Config::getInstance()->save();
+                    $cfgChanged = false;
+                    $settings->syncConfig();
+                    $backend->configdpRun('template reload', ['OPNsense/Netbird']);
+                    clearstatcache(true, $unboundConf);
+                    $afterHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
+                    if ($beforeHash !== $afterHash) {
+                        $backend->configdRun('unbound restart');
+                    }
+                }
+            }
+
+            if ($cfgChanged) {
                 Config::getInstance()->save();
             }
         }

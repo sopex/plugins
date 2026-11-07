@@ -71,7 +71,11 @@
                 return dfObj;
             },
             onAction: () => {
-                updateServiceControlUI('netbird');
+                mapDataToFormUI({'frmSettings': '/api/netbird/settings/get'}).done(() => {
+                    $('.selectpicker').selectpicker('refresh');
+                    updateConditionalFields();
+                    updateServiceControlUI('netbird');
+                });
             }
         });
     });

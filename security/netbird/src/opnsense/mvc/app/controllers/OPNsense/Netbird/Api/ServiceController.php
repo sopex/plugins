@@ -30,6 +30,7 @@ namespace OPNsense\Netbird\Api;
 
 use OPNsense\Base\ApiMutableServiceControllerBase;
 use OPNsense\Core\Backend;
+use OPNsense\Core\Config;
 
 /**
  * Class ServiceController
@@ -52,13 +53,44 @@ class ServiceController extends ApiMutableServiceControllerBase
         $unboundConf = '/usr/local/etc/unbound.opnsense.d/netbird.conf';
         $beforeHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
 
+        $model = $this->getModel();
+        $enabled = (string)$model->general->enable === '1';
+        $unboundForward = (string)$model->dns->unboundForward === '1';
+        $preRestartResolver = ($this->request->isPost() && $enabled && $unboundForward)
+            ? $model->detectDnsResolver()
+            : '';
+
         $result = parent::reconfigureAction();
 
         if ($this->request->isPost()) {
+            $backend = new Backend();
+
+            if ($enabled && $unboundForward) {
+                $detectedResolver = '';
+                for ($i = 0; $i < 35; $i++) {
+                    usleep(200000);
+                    $detectedResolver = $model->detectDnsResolver();
+                    if ($detectedResolver !== '') {
+                        break;
+                    }
+                }
+                if ($detectedResolver === '') {
+                    $detectedResolver = $preRestartResolver !== ''
+                        ? $preRestartResolver
+                        : $model->detectDnsResolver('', true);
+                }
+                if ($detectedResolver !== '' && $model->shouldAutoUpdateDnsResolver($detectedResolver)) {
+                    $model->dns->customAddress = $detectedResolver;
+                    $model->serializeToConfig();
+                    Config::getInstance()->save();
+                    $model->syncConfig();
+                    $backend->configdpRun('template reload', [static::$internalServiceTemplate]);
+                }
+            }
+
             clearstatcache(true, $unboundConf);
             $afterHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
             if ($beforeHash !== $afterHash) {
-                $backend = new Backend();
                 $backend->configdRun('unbound restart');
             }
         }
