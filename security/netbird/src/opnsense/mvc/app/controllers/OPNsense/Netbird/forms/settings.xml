@@ -35,7 +35,7 @@
         <id>settings.general.hostname</id>
         <label>Hostname Override</label>
         <type>text</type>
-        <help>Override the system hostname reported to the NetBird management server</help>
+        <help>Override the system hostname reported to the NetBird management server. Note: on existing peers, this updates the reported system Hostname on service restart, whereas the peer display Name and domain are only set during initial registration.</help>
         <advanced>true</advanced>
     </field>
     <field>
@@ -73,6 +73,12 @@
         <type>checkbox</type>
         <help>Force all peer connections through relay servers instead of direct P2P connections (for troubleshooting)</help>
         <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.syslog.logLevel</id>
+        <label>Log Level</label>
+        <type>dropdown</type>
+        <help>Set the syslog logging level. Setting a certain log level will cause all messages of the specified and more severe log levels to be logged.</help>
     </field>
     <field>
         <type>header</type>
@@ -128,25 +134,29 @@
     </field>
     <field>
         <type>header</type>
-        <label>SSH</label>
+        <label>NetBird Built-in SSH</label>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.ssh.enable</id>
         <label>Enable</label>
         <type>checkbox</type>
-        <help>Allow incoming NetBird SSH connections</help>
+        <help>Allow incoming NetBird SSH connections. Warning: enabling this will bypass and block OPNsense SSH on NetBird users.</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.ssh.enableRoot</id>
         <label>Enable Root Login</label>
         <type>checkbox</type>
         <help>Allow root user login over NetBird SSH</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.ssh.enableSFTP</id>
         <label>Enable SFTP</label>
         <type>checkbox</type>
         <help>Enable SFTP subsystem for file transfers</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.ssh.enableLocalPortForwarding</id>
@@ -180,15 +190,5 @@
         <type>checkbox</type>
         <help>Deprecated by NetBird, may be removed in a future release; not recommended for new setups.</help>
         <advanced>true</advanced>
-    </field>
-    <field>
-        <type>header</type>
-        <label>Syslog Logging</label>
-    </field>
-    <field>
-        <id>settings.syslog.logLevel</id>
-        <label>Log Level</label>
-        <type>dropdown</type>
-        <help>Set the syslog logging level. Setting a certain log level will cause all messages of the specified and more severe log levels to be logged.</help>
     </field>
 </form>

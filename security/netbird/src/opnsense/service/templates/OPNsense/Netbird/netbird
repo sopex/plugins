@@ -1,12 +1,16 @@
 {% if OPNsense.netbird.settings.general.enable|default('0') == '1' %}
 netbird_enable="YES"
-netbird_setup="/usr/local/sbin/pluginctl -c netbird_sync_config"
+netbird_setup="netbird_opnsense_setup"
 netbird_logfile="syslog"
 netbird_loglevel="{{ OPNsense.netbird.settings.syslog.logLevel|default('info') }}"
 netbird_tun_dev="{{ OPNsense.netbird.settings.general.interface|default('wt0') }}"
 {%   set env_vars = [] %}
 {%   if OPNsense.netbird.settings.general.hostname|default('') != '' %}
 {%     do env_vars.append('NB_HOSTNAME=' ~ OPNsense.netbird.settings.general.hostname) %}
+netbird_hostname="{{ OPNsense.netbird.settings.general.hostname }}"
+{%   endif %}
+{%   if OPNsense.netbird.settings.general.disableAutoConnect|default('0') == '1' %}
+netbird_disable_autoconnect="YES"
 {%   endif %}
 {%   if OPNsense.netbird.settings.general.forceRelay|default('0') == '1' %}
 {%     do env_vars.append('NB_FORCE_RELAY=true') %}
@@ -14,13 +18,35 @@ netbird_tun_dev="{{ OPNsense.netbird.settings.general.interface|default('wt0') }
 {%   if env_vars|length > 0 %}
 netbird_env="{{ env_vars|join(' ') }}"
 {%   endif %}
-if [ ! -s /var/db/netbird/config.json ]; then
-    start_postcmd="netbird_first_start_sync"
-    netbird_first_start_sync()
-    {
-        if [ -n "${_netbird_postcmd_done}" ]; then
-            return 0
+start_postcmd="netbird_opnsense_postcmd"
+netbird_opnsense_setup()
+{
+    start_precmd="netbird_opnsense_start_precmd"
+    if [ "$rc_arg" = "start" ]; then
+        _precmd="netbird_opnsense_start_precmd"
+    fi
+}
+netbird_opnsense_start_precmd()
+{
+    netbird_start_precmd
+    /usr/local/sbin/pluginctl -c netbird_sync_config
+    if [ ! -s /var/db/netbird/config.json ]; then
+        export _netbird_need_first_sync=1
+    fi
+    if [ -n "${netbird_hostname}" ]; then
+        local _cur_host
+        _cur_host="$(/sbin/sysctl -n kern.hostname)"
+        if [ ! -s /var/run/netbird.orig_hostname ] && [ -n "${_cur_host}" ] && [ "${_cur_host}" != "${netbird_hostname}" ]; then
+            printf '%s\n' "${_cur_host}" > /var/run/netbird.orig_hostname
         fi
+        if [ -s /var/run/netbird.orig_hostname ]; then
+            /bin/hostname "${netbird_hostname}"
+        fi
+    fi
+}
+netbird_opnsense_postcmd()
+{
+    if [ -n "${_netbird_need_first_sync}" ] && [ -z "${_netbird_postcmd_done}" ]; then
         export _netbird_postcmd_done=1
         local i=0
         while [ ! -s /var/db/netbird/config.json ] && [ $i -lt 50 ]; do
@@ -30,9 +56,33 @@ if [ ! -s /var/db/netbird/config.json ]; then
         if [ -s /var/db/netbird/config.json ]; then
             /usr/local/sbin/pluginctl -c netbird_sync_config
             /usr/local/etc/rc.d/netbird restart
+            if [ -s /var/run/netbird.orig_hostname ]; then
+                /bin/hostname "$(/bin/cat /var/run/netbird.orig_hostname)"
+                /bin/rm -f /var/run/netbird.orig_hostname
+            fi
+            return 0
         fi
-    }
-fi
+    fi
+    if [ -n "${netbird_hostname}" ] && [ -s /var/run/netbird.orig_hostname ]; then
+        if [ "${netbird_disable_autoconnect}" != "YES" ]; then
+            local i=0
+            local _nb_status
+            while [ $i -lt 50 ]; do
+                _nb_status="$(/usr/local/bin/netbird status 2>/dev/null)"
+                if printf '%s\n' "${_nb_status}" | /usr/bin/grep -Eq "Wireguard port: [0-9]+"; then
+                    break
+                fi
+                if printf '%s\n' "${_nb_status}" | /usr/bin/grep -Eq "Daemon status: (NeedsLogin|LoginFailed|SessionExpired)"; then
+                    break
+                fi
+                sleep 0.1
+                i=$((i + 1))
+            done
+        fi
+        /bin/hostname "$(/bin/cat /var/run/netbird.orig_hostname)"
+        /bin/rm -f /var/run/netbird.orig_hostname
+    fi
+}
 {% else %}
 netbird_enable="NO"
 {% endif %}

@@ -39,6 +39,8 @@ $setupKey = trim((string)$auth->setupKey->getValue());
 $hostname = trim((string)$settings->general->hostname->getValue());
 
 $keyFile = null;
+$origHostnameFile = '/var/run/netbird.orig_hostname';
+$hostnameOverridden = false;
 $args = ['--no-browser'];
 
 try {
@@ -83,6 +85,22 @@ try {
         if (in_array($daemonStatus, ['NeedsLogin', 'LoginFailed'], true)) {
             echo "Setup key is required to register this peer.\n";
             exit(0);
+        }
+    }
+
+    if ($hostname !== '') {
+        $currentHost = gethostname();
+        if (
+            (!file_exists($origHostnameFile) || filesize($origHostnameFile) === 0) &&
+            is_string($currentHost) &&
+            $currentHost !== '' &&
+            $currentHost !== $hostname
+        ) {
+            @file_put_contents($origHostnameFile, $currentHost . "\n", LOCK_EX);
+        }
+        if (file_exists($origHostnameFile) && filesize($origHostnameFile) > 0) {
+            exec('/bin/hostname ' . escapeshellarg($hostname));
+            $hostnameOverridden = true;
         }
     }
 
@@ -152,7 +170,7 @@ try {
     }
 
     fclose($pipes[1]);
-    proc_close($process);
+    $exitCode = proc_close($process);
 
     if ($ssoPromptDetected) {
         echo "Setup key is required to register this peer.\n";
@@ -166,6 +184,32 @@ try {
 
     echo rtrim($output, "\r\n") . "\n";
 } finally {
+    if ($hostnameOverridden && file_exists($origHostnameFile)) {
+        if (
+            empty($ssoPromptDetected) &&
+            empty($timedOut) &&
+            (!isset($exitCode) || $exitCode === 0) &&
+            stripos($output ?? '', 'Error') === false
+        ) {
+            for ($i = 0; $i < 50; $i++) {
+                $st = [];
+                exec('/usr/local/bin/netbird status 2>/dev/null', $st);
+                $statusText = implode("\n", $st);
+                if (
+                    preg_match('/Wireguard port:\s*[0-9]+/', $statusText) ||
+                    preg_match('/^Daemon status:\s*(NeedsLogin|LoginFailed|SessionExpired|Disconnected)/mi', $statusText)
+                ) {
+                    break;
+                }
+                usleep(100000);
+            }
+        }
+        $origHostname = trim((string)@file_get_contents($origHostnameFile));
+        if ($origHostname !== '') {
+            exec('/bin/hostname ' . escapeshellarg($origHostname));
+        }
+        @unlink($origHostnameFile);
+    }
     if ($keyFile !== null && file_exists($keyFile)) {
         @unlink($keyFile);
     }
