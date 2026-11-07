@@ -1,35 +1,60 @@
 <model>
     <mount>//OPNsense/netbird/settings</mount>
     <description>NetBird settings</description>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <items>
         <general>
             <enable type="BooleanField">
                 <Default>0</Default>
                 <Required>Y</Required>
             </enable>
+            <interface type="TextField">
+                <Default>wt0</Default>
+                <Required>Y</Required>
+                <Mask>/^[a-zA-Z][a-zA-Z0-9_]{0,14}$/u</Mask>
+                <ValidationMessage>Please specify a valid interface name.</ValidationMessage>
+            </interface>
             <wireguardPort type="IntegerField">
                 <Default>51820</Default>
                 <Required>Y</Required>
-                <minimum>1</minimum>
-                <maximum>65535</maximum>
+                <MinimumValue>0</MinimumValue>
+                <MaximumValue>65535</MaximumValue>
                 <ValidationMessage>Please specify a valid port.</ValidationMessage>
             </wireguardPort>
-            <ipmapping type="TextField">
-                <MaskPerItem>Y</MaskPerItem>
-                <Mask>/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}(?:\/(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|[a-zA-Z][a-zA-Z0-9_.-]*))?$/u</Mask>
-            </ipmapping>
-        </general>
-        <firewall>
-            <allowConfig type="BooleanField">
-                <Default>1</Default>
+            <mtu type="IntegerField">
+                <Default>1280</Default>
                 <Required>Y</Required>
-            </allowConfig>
-            <blockInboundConnection type="BooleanField">
+                <MinimumValue>576</MinimumValue>
+                <MaximumValue>8192</MaximumValue>
+                <ValidationMessage>Please specify a valid MTU (576-8192).</ValidationMessage>
+            </mtu>
+            <hostname type="TextField">
+                <Required>N</Required>
+                <Mask>/^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)?$/u</Mask>
+                <ValidationMessage>Please specify a valid hostname.</ValidationMessage>
+            </hostname>
+            <ipmapping type="TextField">
+                <Required>N</Required>
+                <Mask>/^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|stun)(?:\/(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|[a-zA-Z][a-zA-Z0-9_.-]*))?(?:\s*,\s*(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|stun)(?:\/(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|[a-zA-Z][a-zA-Z0-9_.-]*))?)*$/u</Mask>
+                <ValidationMessage>Please specify valid external IP mappings separated by commas.</ValidationMessage>
+            </ipmapping>
+            <ifaceBlacklist type="InterfaceField">
+                <Multiple>Y</Multiple>
+                <Required>N</Required>
+            </ifaceBlacklist>
+            <networkMonitor type="BooleanField">
                 <Default>0</Default>
                 <Required>Y</Required>
-            </blockInboundConnection>
-        </firewall>
+            </networkMonitor>
+            <disableAutoConnect type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </disableAutoConnect>
+            <forceRelay type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </forceRelay>
+        </general>
         <ssh>
             <enable type="BooleanField">
                 <Default>0</Default>
@@ -51,30 +76,45 @@
                 <Default>0</Default>
                 <Required>Y</Required>
             </enableRemotePortForwarding>
-            <enableAuth type="BooleanField">
-                <Default>1</Default>
-                <Required>Y</Required>
-            </enableAuth>
         </ssh>
         <dns>
             <enable type="BooleanField">
-                <Default>1</Default>
+                <Default>0</Default>
                 <Required>Y</Required>
             </enable>
+            <customAddress type="TextField">
+                <Required>N</Required>
+                <Mask>/^(?:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}|\[[0-9a-fA-F:]+\]):(?:[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/u</Mask>
+                <ValidationMessage>Please specify a valid IP:port address (e.g. 127.0.0.1:5053).</ValidationMessage>
+            </customAddress>
+            <unboundForward type="BooleanField">
+                <Default>0</Default>
+                <Required>Y</Required>
+            </unboundForward>
+            <unboundDomain type="TextField">
+                <Default>netbird.cloud</Default>
+                <Required>Y</Required>
+                <Mask>/^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/u</Mask>
+                <ValidationMessage>Please specify a valid DNS domain name.</ValidationMessage>
+            </unboundDomain>
         </dns>
         <routing>
+            <trafficHandling type="OptionField">
+                <Default>netbird</Default>
+                <Required>Y</Required>
+                <OptionValues>
+                    <netbird>NetBird mode (userspace filter and forwarder)</netbird>
+                    <opnsense>OPNsense mode (pf and kernel routing)</opnsense>
+                </OptionValues>
+            </trafficHandling>
             <accessLan type="BooleanField">
                 <Default>1</Default>
                 <Required>Y</Required>
             </accessLan>
             <acceptClientRoutes type="BooleanField">
-                <Default>1</Default>
+                <Default>0</Default>
                 <Required>Y</Required>
             </acceptClientRoutes>
-            <acceptServerRoutes type="BooleanField">
-                <Default>1</Default>
-                <Required>Y</Required>
-            </acceptServerRoutes>
         </routing>
         <postquantum>
             <enableRosenpass type="BooleanField">

@@ -1,8 +1,38 @@
-{% if OPNsense.netbird.settings.general.enable == '1' %}
+{% if OPNsense.netbird.settings.general.enable|default('0') == '1' %}
 netbird_enable="YES"
 netbird_setup="/usr/local/sbin/pluginctl -c netbird_sync_config"
 netbird_logfile="syslog"
-netbird_loglevel="{{ OPNsense.netbird.settings.syslog.logLevel }}"
+netbird_loglevel="{{ OPNsense.netbird.settings.syslog.logLevel|default('info') }}"
+netbird_tun_dev="{{ OPNsense.netbird.settings.general.interface|default('wt0') }}"
+{%   set env_vars = [] %}
+{%   if OPNsense.netbird.settings.general.hostname|default('') != '' %}
+{%     do env_vars.append('NB_HOSTNAME=' ~ OPNsense.netbird.settings.general.hostname) %}
+{%   endif %}
+{%   if OPNsense.netbird.settings.general.forceRelay|default('0') == '1' %}
+{%     do env_vars.append('NB_FORCE_RELAY=true') %}
+{%   endif %}
+{%   if env_vars|length > 0 %}
+netbird_env="{{ env_vars|join(' ') }}"
+{%   endif %}
+if [ ! -s /var/db/netbird/config.json ]; then
+    start_postcmd="netbird_first_start_sync"
+    netbird_first_start_sync()
+    {
+        if [ -n "${_netbird_postcmd_done}" ]; then
+            return 0
+        fi
+        export _netbird_postcmd_done=1
+        local i=0
+        while [ ! -s /var/db/netbird/config.json ] && [ $i -lt 50 ]; do
+            sleep 0.1
+            i=$((i + 1))
+        done
+        if [ -s /var/db/netbird/config.json ]; then
+            /usr/local/sbin/pluginctl -c netbird_sync_config
+            /usr/local/etc/rc.d/netbird restart
+        fi
+    }
+fi
 {% else %}
 netbird_enable="NO"
 {% endif %}

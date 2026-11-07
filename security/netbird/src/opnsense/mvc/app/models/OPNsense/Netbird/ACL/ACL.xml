@@ -4,6 +4,8 @@
         <patterns>
             <pattern>ui/netbird/*</pattern>
             <pattern>api/netbird/*</pattern>
+            <pattern>ui/diagnostics/log/core/netbird/*</pattern>
+            <pattern>api/diagnostics/log/core/netbird/*</pattern>
         </patterns>
     </page-vpn-netbird>
 </acl>

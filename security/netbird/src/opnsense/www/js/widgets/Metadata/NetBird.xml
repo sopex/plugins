@@ -1,0 +1,25 @@
+<metadata>
+    <NetBird>
+        <filename>NetBird.js</filename>
+        <endpoints>
+            <endpoint>/api/netbird/service/status</endpoint>
+            <endpoint>/api/netbird/status/status</endpoint>
+        </endpoints>
+        <translations>
+            <title>NetBird</title>
+            <serviceDisabled>NetBird service is not running</serviceDisabled>
+            <connected>Connected</connected>
+            <disconnected>Disconnected</disconnected>
+            <fqdn>FQDN</fqdn>
+            <netbirdIP>NetBird IP</netbirdIP>
+            <no>No</no>
+            <noData>Could not fetch data</noData>
+            <online>Online</online>
+            <peers>Peers</peers>
+            <relays>Relays</relays>
+            <signal>Signal</signal>
+            <version>Version</version>
+            <yes>Yes</yes>
+        </translations>
+    </NetBird>
+</metadata>

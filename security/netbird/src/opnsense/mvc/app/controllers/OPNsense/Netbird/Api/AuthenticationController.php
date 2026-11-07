@@ -33,6 +33,7 @@ namespace OPNsense\Netbird\Api;
 
 use OPNsense\Base\ApiMutableModelControllerBase;
 use OPNsense\Core\Backend;
+use OPNsense\Core\Config;
 use OPNsense\Netbird\Authentication;
 
 /**
@@ -48,27 +49,22 @@ class AuthenticationController extends ApiMutableModelControllerBase
     {
         $mdl = new Authentication();
 
-        $managementUrl = $mdl->managementUrl->getValue();
-        $setupKey = $mdl->setupKey->getValue();
-
-        $result = [
+        return [
             'authentication' => [
-                'managementUrl' => $managementUrl,
+                'managementUrl' => $mdl->managementUrl->getValue(),
                 'setupKey' => '',
             ]
         ];
-
-        if (!empty($setupKey)) {
-            $result['authentication']['%setupKey'] = substr($setupKey, 0, 5) . str_repeat('*', max(0, strlen($setupKey) - 7));
-        }
-
-        return $result;
     }
 
-    public function upAction()
+    public function upAction(): array
     {
+        if (!$this->request->isPost()) {
+            return ['result' => 'failed'];
+        }
+        $this->throwReadOnly();
+
         $backend = new Backend();
-        $mdl = new Authentication();
 
         $status = json_decode($backend->configdRun("netbird status-json"), true);
         $connected = $status['management']['connected'] ?? false;
@@ -77,17 +73,31 @@ class AuthenticationController extends ApiMutableModelControllerBase
             $backend->configdRun("netbird down");
         }
 
+        $result = trim((string)$backend->configdRun('netbird up-setup-key'));
 
-        $result = $backend->configdpRun('netbird up-setup-key', [
-            $mdl->managementUrl->getValue(),
-            $mdl->setupKey->getValue()
-        ]);
+        $status = json_decode($backend->configdRun("netbird status-json"), true);
+        $connected = $status['management']['connected'] ?? false;
+        if (json_last_error() === JSON_ERROR_NONE && $connected === true) {
+            $cfg = Config::getInstance()->object();
+            if (isset($cfg->OPNsense->netbird->authentication->setupKey)) {
+                $cfg->OPNsense->netbird->authentication->setupKey = '';
+                Config::getInstance()->save();
+            }
+        }
 
-        return ['result' => trim($result)];
+        return [
+            'result' => $result,
+            'connected' => $connected === true,
+        ];
     }
 
     public function downAction(): array
     {
+        if (!$this->request->isPost()) {
+            return ['result' => 'failed'];
+        }
+        $this->throwReadOnly();
+
         $backend = new Backend();
 
         $status = json_decode($backend->configdRun("netbird status-json"), true);
@@ -95,7 +105,7 @@ class AuthenticationController extends ApiMutableModelControllerBase
 
         if (json_last_error() === JSON_ERROR_NONE && $connected === true) {
             $result = $backend->configdRun("netbird down");
-            return ['result' => trim($result)];
+            return ['result' => trim((string)$result)];
         }
         return ['result' => 'already disconnected or not running'];
     }

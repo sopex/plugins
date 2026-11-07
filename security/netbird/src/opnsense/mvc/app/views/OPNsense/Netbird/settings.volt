@@ -29,10 +29,36 @@
 
 <script>
     $(document).ready(() => {
+        function updateConditionalFields() {
+            const sshEnabled = $("#settings\\.ssh\\.enable").is(":checked");
+            const sshSubFields = [
+                "#settings\\.ssh\\.enableRoot",
+                "#settings\\.ssh\\.enableSFTP",
+                "#settings\\.ssh\\.enableLocalPortForwarding",
+                "#settings\\.ssh\\.enableRemotePortForwarding"
+            ];
+            sshSubFields.forEach((selector) => {
+                $(selector).closest("tr").toggleClass("hidden", !sshEnabled);
+            });
+
+            const netbirdMode = $("#settings\\.routing\\.trafficHandling").val() === "netbird";
+            $("#settings\\.routing\\.accessLan").closest("tr").toggleClass("hidden", !netbirdMode);
+
+            const unboundEnabled = $("#settings\\.dns\\.unboundForward").is(":checked");
+            $("#settings\\.dns\\.unboundDomain").closest("tr").toggleClass("hidden", !unboundEnabled);
+
+            const rosenpassEnabled = $("#settings\\.postquantum\\.enableRosenpass").is(":checked");
+            $("#settings\\.postquantum\\.rosenpassPermissive").closest("tr").toggleClass("hidden", !rosenpassEnabled);
+        }
+
         mapDataToFormUI({'frmSettings': '/api/netbird/settings/get'}).done(() => {
             $('.selectpicker').selectpicker('refresh');
+            updateConditionalFields();
             updateServiceControlUI('netbird');
         });
+
+        $("#settings\\.ssh\\.enable, #settings\\.routing\\.trafficHandling, #settings\\.dns\\.unboundForward, #settings\\.postquantum\\.enableRosenpass")
+            .on("change", updateConditionalFields);
 
         $("#reconfigureAct").SimpleActionButton({
             onPreAction: () => {

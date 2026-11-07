@@ -19,6 +19,13 @@ other peers.
 Plugin Changelog
 ================
 
+1.4
+
+* Fix IP mapping, first-start sync, atomic config write, and status page display bugs
+* Harden authentication API, setup key handling, and status page rendering
+* Rework traffic handling, SSH, routing, and DNS settings; add interface, MTU, relay, and Unbound forwarding options
+* Add peer table, events, SSH server status, auto-refresh, and dashboard widget
+
 1.3
 
 * Added netbird_devices() so that wt0 is a volatile interface (contributed by Myah Mitchell)

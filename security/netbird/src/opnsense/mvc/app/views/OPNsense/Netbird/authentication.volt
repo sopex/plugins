@@ -29,7 +29,7 @@
  #}
 
 <script>
-    function updateNetBirdStatusUI() {
+    function updateNetBirdStatusUI(actionOutput = '') {
         ajaxGet('/api/netbird/settings/get', {}, (settings) => {
             const isEnabled = settings.settings?.general?.enable === '1';
 
@@ -42,17 +42,28 @@
                 let message;
                 let type;
                 if (!isEnabled) {
-                    message = "Enable NetBird first";
+                    message = "{{ lang._('Enable NetBird first') }}";
                     type = "warning";
                 } else {
-                    message = isConnected ? "NetBird is connected" : "NetBird is not connected";
-                    type = isConnected ? "info" : "warning";
+                    message = isConnected
+                        ? "{{ lang._('NetBird is connected') }}"
+                        : "{{ lang._('NetBird is not connected') }}";
+                    type = isConnected ? "info" : (actionOutput ? "danger" : "warning");
+                }
+
+                if (actionOutput) {
+                    message += "\n" + actionOutput;
                 }
 
                 $connectBtn.toggleClass("hidden", isConnected);
                 $disconnectBtn.toggleClass("hidden", !isConnected);
 
-                $("#status").removeClass().addClass("alert alert-" + type).text(message).show();
+                $("#status")
+                    .removeClass()
+                    .addClass("alert alert-" + type)
+                    .css("white-space", "pre-wrap")
+                    .text(message)
+                    .show();
             };
 
             if (!isEnabled) {
@@ -84,16 +95,19 @@
                 });
                 return dfObj;
             },
-            onAction: () => {
+            onAction: (data) => {
+                if (data?.connected) {
+                    $("#authentication\\.setupKey").val("");
+                }
                 updateServiceControlUI('netbird');
-                updateNetBirdStatusUI();
+                updateNetBirdStatusUI(data?.result || '');
             }
         });
 
         $("#disconnectBtn").SimpleActionButton({
-            onAction: () => {
+            onAction: (data) => {
                 updateServiceControlUI('netbird');
-                updateNetBirdStatusUI();
+                updateNetBirdStatusUI(data?.result || '');
             }
         });
     });
@@ -106,7 +120,7 @@
 <section class="page-content-main hidden" id="netbird-actions">
     <div class="content-box">
         <div class="col-md-12">
-            </br>
+            <br/>
             <button class="btn btn-primary hidden" id="connectBtn"
                 data-endpoint="/api/netbird/authentication/up"
                 data-label="{{ lang._('Connect') }}"

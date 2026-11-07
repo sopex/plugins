@@ -1,1 +1,2 @@
 netbird:/etc/rc.conf.d/netbird
+unbound.conf:/usr/local/etc/unbound.opnsense.d/netbird.conf

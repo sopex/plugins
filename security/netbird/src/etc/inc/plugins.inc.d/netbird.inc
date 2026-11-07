@@ -36,8 +36,13 @@ function netbird_enabled()
 
 function netbird_devices()
 {
+    $iface = trim((string)(new \OPNsense\Netbird\Settings())->general->interface);
+    if ($iface === '') {
+        $iface = 'wt0';
+    }
+
     return [[
-        'pattern' => '^wt0$',
+        'pattern' => '^' . preg_quote($iface, '/') . '$',
         'configurable' => false,
         'spoofmac' => false,
         'volatile' => true,

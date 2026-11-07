@@ -29,6 +29,7 @@
 namespace OPNsense\Netbird\Api;
 
 use OPNsense\Base\ApiMutableServiceControllerBase;
+use OPNsense\Core\Backend;
 
 /**
  * Class ServiceController
@@ -40,4 +41,28 @@ class ServiceController extends ApiMutableServiceControllerBase
     protected static $internalServiceEnabled = 'general.enable';
     protected static $internalServiceTemplate = 'OPNsense/Netbird';
     protected static $internalServiceName = 'netbird';
+
+    protected function invokeInterfaceRegistration()
+    {
+        return true;
+    }
+
+    public function reconfigureAction()
+    {
+        $unboundConf = '/usr/local/etc/unbound.opnsense.d/netbird.conf';
+        $beforeHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
+
+        $result = parent::reconfigureAction();
+
+        if ($this->request->isPost()) {
+            clearstatcache(true, $unboundConf);
+            $afterHash = is_file($unboundConf) ? md5_file($unboundConf) : '';
+            if ($beforeHash !== $afterHash) {
+                $backend = new Backend();
+                $backend->configdRun('unbound restart');
+            }
+        }
+
+        return $result;
+    }
 }
