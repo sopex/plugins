@@ -1,8 +1,8 @@
 <menu>
     <VPN>
         <NetBird cssClass="fa fa-lock fa-fw">
-            <Authentication order="10" url="/ui/netbird/authentication"/>
-            <Settings order="20" url="/ui/netbird/settings"/>
+            <Settings order="10" url="/ui/netbird/settings"/>
+            <Authentication order="20" url="/ui/netbird/authentication"/>
             <Status order="30" url="/ui/netbird/status"/>
             <LogFile order="40" VisibleName="Log File" url="/ui/diagnostics/log/core/netbird"/>
         </NetBird>

@@ -40,4 +40,9 @@ class ServiceController extends ApiMutableServiceControllerBase
     protected static $internalServiceEnabled = 'general.enable';
     protected static $internalServiceTemplate = 'OPNsense/Netbird';
     protected static $internalServiceName = 'netbird';
+
+    protected function invokeInterfaceRegistration()
+    {
+        return true;
+    }
 }
