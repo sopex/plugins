@@ -8,8 +8,8 @@
     <field>
         <id>authentication.setupKey</id>
         <label>Setup Key</label>
-        <type>text</type>
+        <type>password</type>
         <hint>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</hint>
-        <help>Set the authentication setup key</help>
+        <help>Setup key from the NetBird dashboard used to register this peer (cleared automatically once connected).</help>
     </field>
 </form>

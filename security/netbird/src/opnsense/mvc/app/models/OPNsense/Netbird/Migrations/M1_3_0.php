@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2025 NetBird GmbH
+ * Copyright (C) 2026 Konstantinos Spartalis <cspartalis@potatonetworks.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace OPNsense\Netbird;
+namespace OPNsense\Netbird\Migrations;
 
-use OPNsense\Base\BaseModel;
+use OPNsense\Base\BaseModelMigration;
+use OPNsense\Core\Config;
+use OPNsense\Netbird\Settings;
 
-class Status extends BaseModel
+class M1_3_0 extends BaseModelMigration
 {
+    /*
+     * The legacy firewall section is not part of the model anymore, so read it from the raw
+     * config. Obsolete nodes (firewall, enableAuth) are dropped when the model is serialized
+     * after the migration.
+     */
+    public function run($model)
+    {
+        if ($model instanceof Settings) {
+            $firewall = Config::getInstance()->object()->OPNsense->netbird->settings->firewall ?? null;
+            if ($firewall !== null) {
+                $model->routing->trafficHandling = (string)$firewall->allowConfig === '0' ? 'opnsense' : 'netbird';
+                $model->routing->blockInbound = (string)$firewall->blockInboundConnection === '1' ? '1' : '0';
+            }
+
+            $ipmapping = trim((string)$model->general->ipmapping);
+            if ($ipmapping !== '') {
+                $items = array_filter(array_map('trim', explode(',', $ipmapping)), 'strlen');
+                $model->general->ipmapping = implode(',', $items);
+            }
+        }
+
+        parent::run($model);
+    }
 }

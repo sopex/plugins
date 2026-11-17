@@ -29,10 +29,35 @@
 
 <script>
     $(document).ready(() => {
+        function updateConditionalFields() {
+            const sshEnabled = $("#settings\\.ssh\\.enable").is(":checked");
+            const sshSubFields = [
+                "#settings\\.ssh\\.enableRoot",
+                "#settings\\.ssh\\.enableSFTP",
+                "#settings\\.ssh\\.enableLocalPortForwarding",
+                "#settings\\.ssh\\.enableRemotePortForwarding"
+            ];
+            sshSubFields.forEach((selector) => {
+                $(selector).closest("tr").toggleClass("hidden", !sshEnabled);
+            });
+
+            const netbirdMode = $("#settings\\.routing\\.trafficHandling").val() === "netbird";
+            $("#settings\\.routing\\.acceptServerRoutes").closest("tr").toggleClass("hidden", !netbirdMode);
+            $("#settings\\.routing\\.accessLan").closest("tr").toggleClass("hidden", !netbirdMode);
+
+            const rosenpassEnabled = $("#settings\\.postquantum\\.enableRosenpass").is(":checked");
+            $("#settings\\.postquantum\\.rosenpassPermissive").closest("tr").toggleClass("hidden", !rosenpassEnabled);
+        }
+
         mapDataToFormUI({'frmSettings': '/api/netbird/settings/get'}).done(() => {
+            formatTokenizersUI();
             $('.selectpicker').selectpicker('refresh');
+            updateConditionalFields();
             updateServiceControlUI('netbird');
         });
+
+        $("#settings\\.ssh\\.enable, #settings\\.routing\\.trafficHandling, #settings\\.postquantum\\.enableRosenpass")
+            .on("change", updateConditionalFields);
 
         $("#reconfigureAct").SimpleActionButton({
             onPreAction: () => {
@@ -43,9 +68,6 @@
                     dfObj.reject();
                 });
                 return dfObj;
-            },
-            onAction: () => {
-                updateServiceControlUI('netbird');
             }
         });
     });
@@ -53,4 +75,7 @@
 <div class="content-box">
     {{ partial("layout_partials/base_form",['fields':settingsForm,'id':'frmSettings']) }}
 </div>
-{{ partial('layout_partials/base_apply_button', {'data_endpoint': '/api/netbird/service/reconfigure', 'data_service_widget': 'netbird'}) }}
+{{ partial('layout_partials/base_apply_button', {
+    'data_endpoint': '/api/netbird/service/reconfigure',
+    'data_service_widget': 'netbird'
+}) }}

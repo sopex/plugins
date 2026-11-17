@@ -7,78 +7,99 @@
         <id>settings.general.enable</id>
         <label>Enable</label>
         <type>checkbox</type>
-        <help>Enable NetBird</help>
+        <help>Enable NetBird.</help>
     </field>
     <field>
         <id>settings.general.wireguardPort</id>
         <label>WireGuard Port</label>
         <type>text</type>
-        <help>Wireguard interface listening port</help>
+        <help>UDP port for the WireGuard interface (use 0 for automatic port selection).</help>
+    </field>
+    <field>
+        <id>settings.general.mtu</id>
+        <label>MTU</label>
+        <type>text</type>
+        <hint>1280</hint>
+        <help>MTU for the WireGuard interface (default 1280, range 576-8192).</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.general.ipmapping</id>
         <label>Force IP Mapping</label>
-        <type>text</type>
-        <hint>12.34.56.78</hint>
-        <help>Forces external IPs maps between local addresses and interfaces. You can specify a comma-separated list with the following: a single IP (12.34.56.78), IP/IP (12.34.56.78/10.0.0.1) or IP/device (12.34.56.80/em1). Leave empty for automatic mapping.</help>
+        <type>select_multiple</type>
+        <style>tokenize</style>
+        <allownew>true</allownew>
+        <help>Advertise static public IPv4 addresses to peers instead of automatic STUN discovery (public-IP, public-IP/local-IP, or public-IP/interface, e.g. 203.0.113.10/em0).</help>
         <advanced>true</advanced>
     </field>
     <field>
+        <id>settings.general.ifaceBlacklist</id>
+        <label>Interface Blacklist</label>
+        <type>select_multiple</type>
+        <help>Interfaces NetBird should ignore when discovering peer connection paths (for example, internal VLANs or backup WANs).</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.general.networkMonitor</id>
+        <label>Network Monitor</label>
+        <type>checkbox</type>
+        <help>Monitor network changes and reconnect automatically when interfaces or routes change.</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.general.disableAutoConnect</id>
+        <label>Disable Auto-Connect</label>
+        <type>checkbox</type>
+        <help>Do not connect automatically when the NetBird service starts.</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.general.forceRelay</id>
+        <label>Force Relay</label>
+        <type>checkbox</type>
+        <help>Force all peer connections through relay servers instead of direct P2P.</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.syslog.logLevel</id>
+        <label>Log Level</label>
+        <type>dropdown</type>
+        <help>Set the syslog logging level.</help>
+    </field>
+    <field>
         <type>header</type>
-        <label>Client Firewall</label>
+        <label>Routing &amp; Traffic Handling</label>
     </field>
     <field>
-        <id>settings.firewall.allowConfig</id>
-        <label>Enable Firewall</label>
+        <id>settings.routing.trafficHandling</id>
+        <label>Traffic Handling</label>
+        <type>dropdown</type>
+        <help>NetBird mode enforces NetBird's access policies and routed networks automatically. OPNsense mode hands traffic to OPNsense so you control firewall rules, NAT, and routing yourself (assign the NetBird interface under Interfaces -&gt; Assignments).</help>
+    </field>
+    <field>
+        <id>settings.routing.acceptServerRoutes</id>
+        <label>Accept Server Routes</label>
         <type>checkbox</type>
-        <help>Allow the client to filter traffic with its built-in firewall. If disabled, you must assign the NetBird interface and manage firewall rules via OPNsense firewall management.
-            Additionally, NetBird routing and DNS may not function as intended.</help>
+        <help>Allow this firewall to act as a routing peer or exit node for routes assigned by the NetBird management server.</help>
     </field>
     <field>
-        <id>settings.firewall.blockInboundConnection</id>
-        <label>Block Inbound Connection</label>
+        <id>settings.routing.accessLan</id>
+        <label>Access LAN</label>
         <type>checkbox</type>
-        <help>Block all inbound connections to the local machine from the WireGuard interface and any routed networks</help>
+        <help>Allow remote NetBird peers to reach OPNsense's local subnets when this firewall acts as a routing peer or exit node.</help>
     </field>
     <field>
-        <type>header</type>
-        <label>SSH</label>
-    </field>
-    <field>
-        <id>settings.ssh.enable</id>
-        <label>Enable</label>
+        <id>settings.routing.blockInbound</id>
+        <label>Block Inbound Connections</label>
         <type>checkbox</type>
-        <help>Allows incoming SSH connections</help>
+        <help>Block incoming connections initiated by remote NetBird peers (also prevents this firewall from acting as a routing peer).</help>
+        <advanced>true</advanced>
     </field>
     <field>
-        <id>settings.ssh.enableRoot</id>
-        <label>Enable Root Login</label>
+        <id>settings.routing.acceptClientRoutes</id>
+        <label>Accept Client Routes</label>
         <type>checkbox</type>
-        <help>Allow root user login</help>
-    </field>
-    <field>
-        <id>settings.ssh.enableSFTP</id>
-        <label>Enable SFTP</label>
-        <type>checkbox</type>
-        <help>Enable SFTP subsystem for file transfers</help>
-    </field>
-    <field>
-        <id>settings.ssh.enableLocalPortForwarding</id>
-        <label>Enable Local Port Forwarding</label>
-        <type>checkbox</type>
-        <help>Allow clients to forward local ports through the server</help>
-    </field>
-    <field>
-        <id>settings.ssh.enableRemotePortForwarding</id>
-        <label>Enable Remote Port Forwarding</label>
-        <type>checkbox</type>
-        <help>Allow clients to request remote port forwarding</help>
-    </field>
-    <field>
-        <id>settings.ssh.enableAuth</id>
-        <label>Enable SSH Authentication</label>
-        <type>checkbox</type>
-        <help>Enable JWT authentication for SSH connections. When disabled, allows any peer with network access</help>
+        <help>Install routes advertised by other NetBird peers into OPNsense's routing table. Warning: if another peer advertises an exit node (0.0.0.0/0), it can override OPNsense's default gateway.</help>
     </field>
     <field>
         <type>header</type>
@@ -86,56 +107,67 @@
     </field>
     <field>
         <id>settings.dns.enable</id>
-        <label>Enable</label>
+        <label>Enable Host DNS Management</label>
         <type>checkbox</type>
-        <help>Allows the client to resolve and configure DNS on the host</help>
+        <help>Allow NetBird to modify resolv.conf on this firewall (conflicts with OPNsense DNS management). Tip: leave this off and configure Services -&gt; Unbound DNS -&gt; Query Forwarding for your NetBird domain pointing to the second-to-last IP of your NetBird subnet (e.g. 100.64.255.254) when using NetBird mode.</help>
     </field>
     <field>
         <type>header</type>
-        <label>Routing</label>
+        <label>NetBird Built-in SSH</label>
+        <advanced>true</advanced>
     </field>
     <field>
-        <id>settings.routing.accessLan</id>
-        <label>Access LAN</label>
+        <id>settings.ssh.enable</id>
+        <label>Enable</label>
         <type>checkbox</type>
-        <help>Allow access to local networks (LAN) when using this peer as a routing peer or exit-node</help>
+        <help>Allow incoming NetBird SSH connections. Warning: bypasses and blocks standard OPNsense SSH for NetBird peers.</help>
+        <advanced>true</advanced>
     </field>
     <field>
-        <id>settings.routing.acceptClientRoutes</id>
-        <label>Accept Client Routes</label>
+        <id>settings.ssh.enableRoot</id>
+        <label>Enable Root Login</label>
         <type>checkbox</type>
-        <help>Accept and process client routes received from the management</help>
+        <help>Allow root login over NetBird SSH.</help>
+        <advanced>true</advanced>
     </field>
     <field>
-        <id>settings.routing.acceptServerRoutes</id>
-        <label>Accept Server Routes</label>
+        <id>settings.ssh.enableSFTP</id>
+        <label>Enable SFTP</label>
         <type>checkbox</type>
-        <help>Enable this peer to act as a router for server routes received from the management</help>
+        <help>Enable SFTP file transfers over NetBird SSH.</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.ssh.enableLocalPortForwarding</id>
+        <label>Enable Local Port Forwarding</label>
+        <type>checkbox</type>
+        <help>Allow local port forwarding over NetBird SSH. Warning: forwarded connections originate from the firewall itself and may bypass pf rules.</help>
+        <advanced>true</advanced>
+    </field>
+    <field>
+        <id>settings.ssh.enableRemotePortForwarding</id>
+        <label>Enable Remote Port Forwarding</label>
+        <type>checkbox</type>
+        <help>Allow remote port forwarding over NetBird SSH. Warning: forwarded connections originate from the firewall itself and may bypass pf rules.</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <type>header</type>
         <label>Post-Quantum</label>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.postquantum.enableRosenpass</id>
         <label>Enable Rosenpass</label>
         <type>checkbox</type>
-        <help>Enable the Rosenpass to provide post-quantum secure connections (Experimental)</help>
+        <help>Deprecated by NetBird and not recommended for new setups.</help>
+        <advanced>true</advanced>
     </field>
     <field>
         <id>settings.postquantum.rosenpassPermissive</id>
         <label>Rosenpass Permissive Mode</label>
         <type>checkbox</type>
-        <help>Enable Rosenpass permissive mode</help>
-    </field>
-    <field>
-        <type>header</type>
-        <label>Syslog Logging</label>
-    </field>
-    <field>
-        <id>settings.syslog.logLevel</id>
-        <label>Log Level</label>
-        <type>dropdown</type>
-        <help>Set the syslog logging level. Setting a certain log level will cause all messages of the specified and more severe log levels to be logged.</help>
+        <help>Accept standard WireGuard connections from peers without Rosenpass enabled (deprecated by NetBird).</help>
+        <advanced>true</advanced>
     </field>
 </form>

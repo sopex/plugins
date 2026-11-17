@@ -19,9 +19,17 @@ other peers.
 Plugin Changelog
 ================
 
+1.4
+
+* Fix IP mapping, first-start sync and atomic config write (contributed by Konstantinos Spartalis)
+* Harden setup key handling (contributed by Konstantinos Spartalis)
+* Improve status page rendering (contributed by Konstantinos Spartalis)
+* Rework traffic handling and add new client settings (contributed by Konstantinos Spartalis)
+* Add dashboard widget (contributed by Konstantinos Spartalis)
+
 1.3
 
-* Added netbird_devices() so that wt0 is a volatile interface (contributed by Myah Mitchell)
-* Added IP Mapping option and authentication banner (contributed by Konstantinos Spartalis)
+* Add netbird_devices() so that wt0 is a volatile interface (contributed by Myah Mitchell)
+* Add IP Mapping option and authentication banner (contributed by Konstantinos Spartalis)
 * Fix quantum peer state display (contributed by Konstantinos Spartalis)
 * Fix setupKey usage after UpdateOnlyTextField introduction

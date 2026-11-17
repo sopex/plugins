@@ -29,7 +29,24 @@
 namespace OPNsense\Netbird;
 
 use OPNsense\Base\BaseModel;
+use OPNsense\Base\Messages\Message;
 
 class Authentication extends BaseModel
 {
+    public function performValidation($validateFullModel = false)
+    {
+        $messages = parent::performValidation($validateFullModel);
+
+        if ($validateFullModel || $this->setupKey->isFieldChanged()) {
+            $key = (string)$this->setupKey->getValue();
+            if ($key !== '' && !preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i', $key)) {
+                $messages->appendMessage(new Message(
+                    gettext('Please specify a valid setup key.'),
+                    $this->setupKey->__reference
+                ));
+            }
+        }
+
+        return $messages;
+    }
 }

@@ -33,7 +33,7 @@ namespace OPNsense\Netbird\Api;
 
 use OPNsense\Base\ApiMutableModelControllerBase;
 use OPNsense\Core\Backend;
-use OPNsense\Netbird\Authentication;
+use OPNsense\Core\Config;
 
 /**
  * netbird authentication controller
@@ -44,59 +44,80 @@ class AuthenticationController extends ApiMutableModelControllerBase
     protected static $internalModelName = 'authentication';
     protected static $internalModelClass = '\OPNsense\Netbird\Authentication';
 
-    public function getAction(): array
+    public function upAction(): array
     {
-        $mdl = new Authentication();
-
-        $managementUrl = $mdl->managementUrl->getValue();
-        $setupKey = $mdl->setupKey->getValue();
-
-        $result = [
-            'authentication' => [
-                'managementUrl' => $managementUrl,
-                'setupKey' => '',
-            ]
-        ];
-
-        if (!empty($setupKey)) {
-            $result['authentication']['%setupKey'] = substr($setupKey, 0, 5) . str_repeat('*', max(0, strlen($setupKey) - 7));
+        if (!$this->request->isPost()) {
+            return ['result' => 'failed'];
         }
+        $this->throwReadOnly();
 
-        return $result;
-    }
-
-    public function upAction()
-    {
         $backend = new Backend();
-        $mdl = new Authentication();
+        $usedKey = (string)(Config::getInstance()->object()->OPNsense->netbird->authentication->setupKey ?? '');
 
-        $status = json_decode($backend->configdRun("netbird status-json"), true);
-        $connected = $status['management']['connected'] ?? false;
-
-        if (json_last_error() === JSON_ERROR_NONE && $connected === true) {
-            $backend->configdRun("netbird down");
+        $status = json_decode((string)$backend->configdRun('netbird status-json'), true);
+        if (json_last_error() === JSON_ERROR_NONE && ($status['management']['connected'] ?? false) === true) {
+            /* registering with a new setup key requires a fresh login */
+            $backend->configdRun('netbird down');
         }
 
+        $raw = trim((string)$backend->configdRun('netbird up-setup-key'));
+        $up = json_decode($raw, true);
+        if (is_array($up) && array_key_exists('ok', $up)) {
+            $upOk = $up['ok'] === true;
+            $result = trim((string)($up['output'] ?? ''));
+        } else {
+            $upOk = false;
+            $result = $raw;
+        }
 
-        $result = $backend->configdpRun('netbird up-setup-key', [
-            $mdl->managementUrl->getValue(),
-            $mdl->setupKey->getValue()
-        ]);
+        $status = json_decode((string)$backend->configdRun('netbird status-json'), true);
+        $connected = $upOk &&
+            json_last_error() === JSON_ERROR_NONE &&
+            ($status['management']['connected'] ?? false) === true;
 
-        return ['result' => trim($result)];
+        if ($connected && $usedKey !== '') {
+            /* the setup key is not needed anymore once the peer is registered */
+            $config = Config::getInstance();
+            $config->lock();
+            try {
+                $cfg = $config->object();
+                if ((string)($cfg->OPNsense->netbird->authentication->setupKey ?? '') === $usedKey) {
+                    $cfg->OPNsense->netbird->authentication->setupKey = '';
+                    $config->save();
+                }
+            } finally {
+                $config->unlock();
+            }
+        }
+
+        return [
+            'result' => $result,
+            'connected' => $connected,
+        ];
     }
 
     public function downAction(): array
     {
+        if (!$this->request->isPost()) {
+            return ['result' => 'failed'];
+        }
+        $this->throwReadOnly();
+
         $backend = new Backend();
 
-        $status = json_decode($backend->configdRun("netbird status-json"), true);
-        $connected = $status['management']['connected'] ?? false;
+        $status = json_decode((string)$backend->configdRun('netbird status-json'), true);
+        $connected = json_last_error() === JSON_ERROR_NONE && ($status['management']['connected'] ?? false) === true;
 
-        if (json_last_error() === JSON_ERROR_NONE && $connected === true) {
-            $result = $backend->configdRun("netbird down");
-            return ['result' => trim($result)];
+        if ($connected) {
+            $raw = trim((string)$backend->configdRun('netbird down'));
+            return [
+                'result' => $raw === 'OK' ? '' : $raw,
+                'disconnected' => $raw === 'OK',
+            ];
         }
-        return ['result' => 'already disconnected or not running'];
+        return [
+            'result' => 'already disconnected or not running',
+            'disconnected' => true,
+        ];
     }
 }

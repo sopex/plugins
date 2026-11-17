@@ -3,7 +3,12 @@
         <name>VPN: NetBird</name>
         <patterns>
             <pattern>ui/netbird/*</pattern>
-            <pattern>api/netbird/*</pattern>
+            <pattern>api/netbird/authentication/*</pattern>
+            <pattern>api/netbird/service/*</pattern>
+            <pattern>api/netbird/settings/*</pattern>
+            <pattern>api/netbird/status/*</pattern>
+            <pattern>ui/diagnostics/log/core/netbird/*</pattern>
+            <pattern>api/diagnostics/log/core/netbird/*</pattern>
         </patterns>
     </page-vpn-netbird>
 </acl>

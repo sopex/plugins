@@ -31,22 +31,19 @@
 
 namespace OPNsense\Netbird\Api;
 
-use OPNsense\Base\ApiMutableModelControllerBase;
+use OPNsense\Base\ApiControllerBase;
 use OPNsense\Core\Backend;
 
 /**
  * Class StatusController
  * @package OPNsense\Netbird
  */
-class StatusController extends ApiMutableModelControllerBase
+class StatusController extends ApiControllerBase
 {
-    protected static $internalModelClass = '\OPNsense\Netbird\Status';
-    protected static $internalModelName = 'Netbird';
-
     public function statusAction(): array
     {
-        $backend =  new Backend();
-        $status = json_decode($backend->configdRun("netbird status-json"), true);
+        $backend = new Backend();
+        $status = json_decode((string)$backend->configdRun("netbird status-json"), true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($status)) {
             return $status;
         }
