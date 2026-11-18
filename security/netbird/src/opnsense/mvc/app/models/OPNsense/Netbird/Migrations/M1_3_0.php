@@ -47,6 +47,12 @@ class M1_3_0 extends BaseModelMigration
                 $model->routing->trafficHandling = (string)$firewall->allowConfig === '0' ? 'opnsense' : 'netbird';
                 $model->routing->blockInbound = (string)$firewall->blockInboundConnection === '1' ? '1' : '0';
             }
+
+            $ipmapping = trim((string)$model->general->ipmapping);
+            if ($ipmapping !== '') {
+                $items = array_filter(array_map('trim', explode(',', $ipmapping)), 'strlen');
+                $model->general->ipmapping = implode(',', $items);
+            }
         }
 
         parent::run($model);

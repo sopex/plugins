@@ -49,15 +49,12 @@
             $("#settings\\.postquantum\\.rosenpassPermissive").closest("tr").toggleClass("hidden", !rosenpassEnabled);
         }
 
-        function loadSettingsForm() {
-            mapDataToFormUI({'frmSettings': '/api/netbird/settings/get'}).done(() => {
-                $('.selectpicker').selectpicker('refresh');
-                updateConditionalFields();
-                updateServiceControlUI('netbird');
-            });
-        }
-
-        loadSettingsForm();
+        mapDataToFormUI({'frmSettings': '/api/netbird/settings/get'}).done(() => {
+            formatTokenizersUI();
+            $('.selectpicker').selectpicker('refresh');
+            updateConditionalFields();
+            updateServiceControlUI('netbird');
+        });
 
         $("#settings\\.ssh\\.enable, #settings\\.routing\\.trafficHandling, #settings\\.postquantum\\.enableRosenpass")
             .on("change", updateConditionalFields);
@@ -71,9 +68,6 @@
                     dfObj.reject();
                 });
                 return dfObj;
-            },
-            onAction: () => {
-                loadSettingsForm();
             }
         });
     });
