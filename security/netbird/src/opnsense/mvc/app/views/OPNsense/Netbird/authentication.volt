@@ -99,8 +99,9 @@
                 if (data?.connected) {
                     $("#authentication\\.setupKey").val("");
                 }
+                const output = data?.connected ? '' : (data?.result || '');
                 updateServiceControlUI('netbird');
-                updateNetBirdStatusUI(data?.result || '', !data?.connected);
+                updateNetBirdStatusUI(output, !data?.connected);
             }
         });
 
